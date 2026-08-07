@@ -79,11 +79,14 @@ class AuthService {
     await AdminRepository.updateRefreshToken(adminId, null);
   }
 
-  /**
+/**
    * Forgot password - send reset email.
    */
   async forgotPassword(email) {
-    const admin = await AdminRepository.findOne({ email });
+    // findByEmail returns a real Mongoose document (AdminRepository.findOne
+    // via BaseRepository returns a lean object with _id renamed to id, where
+    // ._id is undefined and .save() is unavailable). Use the document method.
+    const admin = await AdminRepository.findByEmail(email);
     if (!admin) {
       // Don't reveal whether email exists
       return { message: 'If this email is registered, a reset link has been sent.' };
@@ -120,13 +123,13 @@ class AuthService {
       throw AppError.badRequest('Invalid reset token');
     }
 
-    const admin = await AdminRepository.findOne({
-      email: decoded.email,
-      resetPasswordToken: resetToken,
-      resetPasswordExpires: { $gt: new Date() },
-    });
-
-    if (!admin) {
+const admin = await AdminRepository.findByEmail(decoded.email);
+    if (
+      !admin ||
+      admin.resetPasswordToken !== resetToken ||
+      !admin.resetPasswordExpires ||
+      new Date() > new Date(admin.resetPasswordExpires)
+    ) {
       throw AppError.badRequest('Invalid or expired reset token');
     }
 

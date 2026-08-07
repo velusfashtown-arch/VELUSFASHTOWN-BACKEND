@@ -38,9 +38,36 @@ const authenticateCustomer = asyncHandler(async (req, res, next) => {
     throw AppError.forbidden('Account is deactivated');
   }
 
-  req.customer = customer;
+req.customer = customer;
   req.customerId = customer._id.toString();
   next();
 });
 
-module.exports = { authenticateCustomer };
+/**
+ * Optional customer auth — attaches the customer when a valid token is
+ * present, but never blocks the request. Used for guest checkout so
+ * visitors can place orders without forcing registration.
+ */
+const optionalCustomer = async (req, res, next) => {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+
+  if (!token) return next();
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.customerId) {
+      const customer = await Customer.findById(decoded.customerId).select('-password -otp -otpExpiry -resetPasswordToken -resetPasswordExpires');
+      if (customer && customer.isActive) {
+        req.customer = customer;
+        req.customerId = customer._id.toString();
+      }
+    }
+  } catch {
+    // Ignore invalid/expired tokens for guest checkout — just proceed.
+  }
+
+  next();
+};
+
+module.exports = { authenticateCustomer, optionalCustomer };

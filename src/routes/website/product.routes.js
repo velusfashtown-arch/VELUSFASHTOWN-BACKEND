@@ -42,6 +42,7 @@ router.get('/new-arrivals', ProductController.getNewArrivals);
 router.get('/flash-sale', ProductController.getFlashSale);
 router.get('/recommended', ProductController.getRecommended);
 router.get('/search', ProductController.search);
+router.post('/check-delivery', ProductController.checkDelivery);
 
 router.get('/:slug', ProductController.getBySlug);
 router.get('/:id/related', ProductController.getRelated);

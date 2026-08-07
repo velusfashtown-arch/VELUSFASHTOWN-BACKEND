@@ -16,11 +16,14 @@ const createTransport = () => {
     return null;
   }
 
+  const rejectUnauthorized = process.env.MAIL_TLS_REJECT_UNAUTH !== 'false';
+
   transport = nodemailer.createTransport({
     host,
     port,
     secure: port === 465,
     auth: { user, pass },
+    tls: { rejectUnauthorized },
   });
 
   logger.info('Mail transport configured successfully');

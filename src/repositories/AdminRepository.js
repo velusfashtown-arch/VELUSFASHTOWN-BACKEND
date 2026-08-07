@@ -21,6 +21,14 @@ class AdminRepository extends BaseRepository {
   }
 
   /**
+   * Find admin by email and return a real Mongoose document (not lean)
+   * so instance methods like .save() work. Used by the password reset flow.
+   */
+  async findByEmail(email) {
+    return this.model.findOne({ email });
+  }
+
+  /**
    * Update refresh token.
    */
   async updateRefreshToken(adminId, refreshToken) {

@@ -36,20 +36,23 @@ class PaymentController {
       throw AppError.badRequest('This order is already paid');
     }
 
-    const razorpay = getRazorpay();
+const razorpay = getRazorpay();
+
+    // The repository returns a lean document where _id is renamed to `id`.
+    const storedOrderId = order.id || order._id?.toString();
 
     const razorpayOrder = await razorpay.orders.create({
       amount: Math.round(order.total * 100), // Razorpay expects amount in paise
       currency: 'INR',
       receipt: order.orderNumber,
       notes: {
-        orderId: order._id.toString(),
+        orderId: storedOrderId,
         orderNumber: order.orderNumber,
       },
     });
 
     // Store razorpay_order_id in the order
-    await OrderRepository.updateById(order._id, {
+    await OrderRepository.updateById(storedOrderId, {
       'paymentDetails.transactionId': razorpayOrder.id,
       'paymentDetails.paymentGateway': 'razorpay',
     });

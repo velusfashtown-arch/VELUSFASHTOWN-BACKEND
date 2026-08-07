@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const BaseRepository = require('./BaseRepository');
 const Product = require('../models/admin/Product');
 
@@ -152,12 +153,37 @@ class ProductRepository extends BaseRepository {
   }
 
   /**
-   * Get products by IDs with optional fields.
+   * Get products matching either their custom productId or Mongo _id.
+   * Used by order placement, which now receives the customer-facing
+   * productId (e.g. "PRD00001") rather than the internal Mongo id.
    */
-  async findByIds(ids, select = '') {
-    let query = this.model.find({ _id: { $in: ids } });
+  async findByPublicIds(publicIds, select = '') {
+    const objectIds = publicIds.filter((v) => mongoose.Types.ObjectId.isValid(v));
+    let query = this.model.find({
+      $or: [
+        { productId: { $in: publicIds } },
+        ...(objectIds.length ? [{ _id: { $in: objectIds } }] : []),
+      ],
+    });
     if (select) query = query.select(select);
     return query.exec();
+  }
+
+  /**
+   * Resolve a single product by its customer-facing productId, falling
+   * back to the Mongo _id (used internally / by admin).
+   */
+  async findByPublicId(publicId, options = {}) {
+    const byProductId = await this.findOne({ productId: publicId, isDeleted: false }, options);
+    if (byProductId) return byProductId;
+    if (mongoose.Types.ObjectId.isValid(publicId)) {
+      try {
+        return await this.findById(publicId, options);
+      } catch {
+        return null;
+      }
+    }
+    return null;
   }
 
   /**

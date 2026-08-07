@@ -114,6 +114,37 @@ class WebsiteProductController {
   });
 
   /**
+   * POST /api/website/products/check-delivery - Pincode delivery estimate.
+   * Currently a static, format-validated estimate (no external courier
+   * call yet); the response shape is deliberately what a real Shiprocket
+   * serviceability check would return, so swapping the implementation
+   * later won't require a frontend change.
+   */
+  checkDelivery = asyncHandler(async (req, res) => {
+    const { pincode, productId } = req.body;
+
+    if (!/^[1-9][0-9]{5}$/.test(String(pincode || ''))) {
+      return res.status(400).json({ success: false, message: 'Enter a valid 6-digit pincode', data: null });
+    }
+
+    let codAvailable = true;
+    if (productId) {
+      try {
+        const product = await ProductService.getProduct(productId);
+        codAvailable = product?.codAvailable !== false;
+      } catch {
+        // Unknown product id — still return a generic estimate.
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: 'Success',
+      data: { serviceable: true, estimatedDays: '4-6', codAvailable },
+    });
+  });
+
+  /**
    * GET /api/website/products/:id/related - Related products
    */
   getRelated = asyncHandler(async (req, res) => {

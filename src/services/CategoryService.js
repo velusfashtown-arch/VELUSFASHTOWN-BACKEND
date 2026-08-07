@@ -45,16 +45,24 @@ class CategoryService {
     return category;
   }
 
-  /**
+/**
    * Create a new category.
    */
   async createCategory(data) {
-    // If parent is provided, verify it exists
+    // If parent is provided, verify it exists. The parent may be referenced
+    // by its Mongo _id OR by its app-generated public categoryId (e.g. the
+    // "CAT-XXXX" string the admin UI sends), so resolve it the same way as
+    // findCategoryByIdentifier does.
     if (data.parent) {
-      const parent = await CategoryRepository.findById(data.parent).catch(() => null);
+      const isObjectId = /^[a-f\d]{24}$/i.test(data.parent);
+      const parent = isObjectId
+        ? await CategoryRepository.findById(data.parent).catch(() => null)
+        : await CategoryRepository.findOne({ categoryId: data.parent }).catch(() => null);
       if (!parent) {
         throw AppError.badRequest('Parent category not found');
       }
+      // Persist the resolved Mongo _id as the parent reference.
+      data.parent = parent._id;
     }
 
     const category = await CategoryRepository.create(data);
@@ -62,7 +70,7 @@ class CategoryService {
     return category;
   }
 
-  /**
+/**
    * Update a category.
    */
   async updateCategory(id, data) {
@@ -73,12 +81,17 @@ class CategoryService {
       throw AppError.badRequest('A category cannot be its own parent');
     }
 
-    // If parent is provided, verify it exists
+    // If parent is provided, verify it exists. Resolve both Mongo _id and
+    // public categoryId references (same as createCategory).
     if (data.parent) {
-      const parent = await CategoryRepository.findById(data.parent).catch(() => null);
+      const isObjectId = /^[a-f\d]{24}$/i.test(data.parent);
+      const parent = isObjectId
+        ? await CategoryRepository.findById(data.parent).catch(() => null)
+        : await CategoryRepository.findOne({ categoryId: data.parent }).catch(() => null);
       if (!parent) {
         throw AppError.badRequest('Parent category not found');
       }
+      data.parent = parent._id;
     }
 
     const category = await CategoryRepository.updateById(existingCategory._id, data);

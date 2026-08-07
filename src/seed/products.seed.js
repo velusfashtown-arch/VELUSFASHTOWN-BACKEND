@@ -1,11 +1,26 @@
 const Product = require('../models/admin/Product');
 const Category = require('../models/admin/Category');
 const logger = require('../utils/logger');
+const { generateSlug } = require('../utils/helpers');
 const { STOCK_STATUS, PRODUCT_STATUS } = require('../constants');
 
 async function seedProducts() {
   const forceReset = String(process.env.ADMIN_FORCE_RESET || '').toLowerCase() === 'true';
   const existingCount = await Product.countDocuments({});
+
+  // Backfill slugs on any existing products that were created before slug
+  // generation was added (they have slug: null, which violates the unique
+  // index once more than one such row exists). This is safe and idempotent.
+  const missingSlugDoc = await Product.findOne({ $or: [{ slug: null }, { slug: '' }, { slug: { $exists: false } }] });
+  if (missingSlugDoc) {
+    const missing = await Product.find({ $or: [{ slug: null }, { slug: '' }, { slug: { $exists: false } }] });
+    for (const doc of missing) {
+      doc.slug = generateSlug(doc.name || `product-${doc._id}`);
+      await doc.save();
+    }
+    logger.info(`Backfilled slugs for ${missing.length} existing product(s).`);
+  }
+
   if (existingCount > 0 && !forceReset) {
     logger.info(`Products already seeded (${existingCount}). Skipping.`);
     return;
@@ -126,7 +141,15 @@ name: "VELU'S FASHTOWN Chiffon Saree - Everyday Elegance",
     },
   ];
 
-  await Product.insertMany(products);
+// insertMany bypasses the Mongoose pre('save') hook, so generate a unique
+  // slug for each product here (the slug field has a unique index and must
+  // not be null for multiple documents).
+  const withSlugs = products.map((product) => ({
+    ...product,
+    slug: generateSlug(product.name),
+  }));
+
+  await Product.insertMany(withSlugs);
   logger.info(`Seeded ${products.length} products`);
 }
 

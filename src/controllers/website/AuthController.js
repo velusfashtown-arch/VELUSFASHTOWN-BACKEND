@@ -8,7 +8,7 @@ const ApiResponse = require('../../utils/response');
 const AppError = require('../../utils/AppError');
 const logger = require('../../utils/logger');
 const { generateAccessToken } = require('../../config/jwt');
-const { getTransport, FROM } = require('../../config/mail');
+const { sendCustomerOtpEmail } = require('../../helpers/email');
 
 class WebsiteAuthController {
   /**
@@ -83,28 +83,13 @@ class WebsiteAuthController {
     customer.otpExpiry = otpExpiry;
     await customer.save();
 
-    const transport = getTransport();
-    if (transport) {
-      try {
-        await transport.sendMail({
-          from: FROM(),
-          to: email,
-          subject: `Your VELU'S FASHTOWN password reset code`,
-          html: `<div style="font-family:sans-serif;max-width:420px;margin:0 auto;padding:24px;">
-            <h2 style="margin:0 0 12px;">Reset your password</h2>
-            <p style="color:#555;">Use the code below to reset your VELU'S FASHTOWN account password. It expires in 10 minutes.</p>
-            <p style="font-size:32px;font-weight:bold;letter-spacing:8px;text-align:center;margin:24px 0;">${otp}</p>
-            <p style="color:#999;font-size:12px;">If you didn't request this, you can safely ignore this email.</p>
-          </div>`,
-        });
-      } catch (error) {
-        logger.error(`Failed to send OTP email to ${email}: ${error.message}`);
-        console.log(`[OTP for ${email}]: ${otp}`);
-      }
-    } else {
-      // SMTP not configured — fall back to console so local dev still works.
-      console.log(`[OTP for ${email}]: ${otp}`);
+    try {
+      await sendCustomerOtpEmail({ email, otp });
+    } catch (error) {
+      logger.error(`Failed to send OTP email to ${email}: ${error.message}`);
     }
+    // sendCustomerOtpEmail already falls back to a console log when SMTP
+    // isn't configured, so local dev keeps working either way.
 
     return ApiResponse.success(res, {
       message: 'If this email is registered, an OTP has been sent.',

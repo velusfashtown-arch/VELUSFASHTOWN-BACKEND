@@ -54,9 +54,13 @@ class OrderService {
   async placeOrder(orderData) {
     const { customer, items, paymentMethod, couponCode, customerRef } = orderData;
 
-    // Validate and fetch products
+    // Validate and fetch products — items reference the customer-facing
+    // productId (e.g. "PRD00001"), not the internal Mongo _id.
     const productIds = items.map((item) => item.productId);
-    const products = await ProductRepository.findByIds(productIds, '');
+    const products = await ProductRepository.findByPublicIds(productIds, '');
+    const findProduct = (item) => products.find(
+      (p) => p.productId === item.productId || p._id.toString() === item.productId
+    );
 
     if (products.length !== productIds.length) {
       throw AppError.badRequest('One or more products not found');
@@ -67,9 +71,7 @@ class OrderService {
     let subtotal = 0;
 
     for (const item of items) {
-      const product = products.find(
-        (p) => p._id.toString() === item.productId
-      );
+      const product = findProduct(item);
 
       if (!product) {
         throw AppError.badRequest(`Product ${item.productId} not found`);
@@ -131,7 +133,7 @@ class OrderService {
     // Decrease stock
     await Promise.all(
       items.map((item) => {
-        const product = products.find((p) => p._id.toString() === item.productId);
+        const product = findProduct(item);
         return ProductRepository.updateById(product._id, {
           stock: Math.max(0, product.stock - item.quantity),
           totalSold: (product.totalSold || 0) + item.quantity,

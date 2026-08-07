@@ -12,11 +12,23 @@ function cleanCategory(category) {
   };
 }
 
+// Same id-swap as cleanCategory, but also fixes up a populated `parent`
+// sub-object so its id is the parent's categoryId too — otherwise a
+// selected category's id (categoryId) can never match its children's
+// `parent.id` (which would still be the Mongo id), breaking any
+// category-to-subcategory lookup by id.
+function withCategoryId(category) {
+  const parent = category.parent && typeof category.parent === 'object'
+    ? { ...category.parent, id: category.parent.categoryId }
+    : category.parent;
+  return { ...category, id: category.categoryId, parent };
+}
+
 class CategoryController {
   list = asyncHandler(async (req, res) => {
     const result = await CategoryService.listCategories(req.query);
     const data = req.query.includeRelations === 'true'
-      ? result.data.map((category) => ({ ...category, id: category.categoryId }))
+      ? result.data.map(withCategoryId)
       : result.data.map(cleanCategory);
 
     return ApiResponse.paginated(res, {
