@@ -93,8 +93,10 @@ const createProductSchema = z.object({
 
 const updateProductSchema = z.object({
   body: z.object({
+    productId: z.string().optional(),
     name: z.string().min(1).max(500).optional(),
     sku: z.string().optional(),
+    slug: z.string().optional(),
     description: z.string().max(5000).optional(),
     shortDescription: z.string().max(300).optional(),
     mrp: z.number().min(0).optional(),
@@ -104,14 +106,58 @@ const updateProductSchema = z.object({
     gst: z.number().min(0).max(100).optional(),
     category: z.string().optional().nullable(),
     subCategory: z.string().optional().nullable(),
+    productType: z.string().optional(),
+    occasion: z.array(z.string()).optional(),
     stock: z.number().min(0).optional(),
     lowStockAlert: z.number().min(0).optional(),
     status: z.string().optional(),
     tags: z.array(z.string()).optional(),
     hasVariants: z.boolean().optional(),
     variants: z.array(variantSchema).optional(),
-    images: z.array(imageSchema).optional(),
+    // Saree specific fields
+    sareeFabric: z.string().optional(),
+    blouseFabric: z.string().optional(),
+    workType: z.string().optional(),
+    borderType: z.string().optional(),
+    palluType: z.string().optional(),
+    sareeLength: z.string().optional(),
+    blouseLength: z.string().optional(),
+    primaryColor: z.string().optional(),
+    secondaryColor: z.string().optional(),
+    pattern: z.string().optional(),
+    printType: z.string().optional(),
+    style: z.string().optional(),
+    blouseIncluded: z.boolean().optional(),
+    blouseType: z.string().optional(),
+    blouseColor: z.string().optional(),
+    // SEO
+    seoTitle: z.string().max(70).optional(),
+    seoDescription: z.string().max(160).optional(),
+    seoKeywords: z.array(z.string()).optional(),
+    canonicalUrl: z.string().optional(),
+    // Images - accept string URLs OR full image objects
+    images: z.array(z.union([z.string(), imageSchema])).optional(),
     mainImage: z.string().optional(),
+    thumbnail: z.string().optional(),
+    // Videos
+    productVideo: z.string().optional(),
+    youtubeUrl: z.string().optional(),
+    instagramReelUrl: z.string().optional(),
+    // Shipping
+    weight: z.number().min(0).optional(),
+    length: z.number().min(0).optional(),
+    width: z.number().min(0).optional(),
+    height: z.number().min(0).optional(),
+    shippingCharge: z.number().min(0).optional(),
+    codAvailable: z.boolean().optional(),
+    // Return / Exchange
+    returnAvailable: z.boolean().optional(),
+    returnDays: z.number().min(0).optional(),
+    exchangeAvailable: z.boolean().optional(),
+    // Additional details
+    countryOfOrigin: z.string().optional(),
+    manufacturer: z.string().optional(),
+    packer: z.string().optional(),
   }),
 });
 
