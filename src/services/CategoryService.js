@@ -61,8 +61,10 @@ class CategoryService {
       if (!parent) {
         throw AppError.badRequest('Parent category not found');
       }
-      // Persist the resolved Mongo _id as the parent reference.
-      data.parent = parent._id;
+      // CategoryRepository.findById/findOne return lean results (via
+      // BaseRepository), which have _id renamed to id — parent._id would
+      // be undefined here, silently dropping the reference back to null.
+      data.parent = parent.id || parent._id;
     }
 
     const category = await CategoryRepository.create(data);
@@ -75,9 +77,11 @@ class CategoryService {
    */
   async updateCategory(id, data) {
     const existingCategory = await this.findCategoryByIdentifier(id);
+    // findCategoryByIdentifier returns a lean result (_id renamed to id).
+    const existingId = existingCategory.id || existingCategory._id?.toString();
 
     // Prevent circular parent reference
-    if (data.parent && data.parent === existingCategory._id.toString()) {
+    if (data.parent && (data.parent === existingId || data.parent === existingCategory.categoryId)) {
       throw AppError.badRequest('A category cannot be its own parent');
     }
 
@@ -91,10 +95,13 @@ class CategoryService {
       if (!parent) {
         throw AppError.badRequest('Parent category not found');
       }
-      data.parent = parent._id;
+      // CategoryRepository.findById/findOne return lean results (via
+      // BaseRepository), which have _id renamed to id — parent._id would
+      // be undefined here, silently dropping the reference back to null.
+      data.parent = parent.id || parent._id;
     }
 
-    const category = await CategoryRepository.updateById(existingCategory._id, data);
+    const category = await CategoryRepository.updateById(existingId, data);
     logger.info(`Category updated: ${category.name}`);
     return category;
   }
@@ -104,9 +111,10 @@ class CategoryService {
    */
   async deleteCategory(id) {
     const category = await this.findCategoryByIdentifier(id);
+    const categoryId = category.id || category._id;
 
     // Cascade-delete the category and every descendant (subcategories).
-    const deletedCount = await CategoryRepository.deleteRecursive(category._id);
+    const deletedCount = await CategoryRepository.deleteRecursive(categoryId);
     logger.info(`Category deleted: ${category.categoryId} (${deletedCount} record${deletedCount > 1 ? 's' : ''})`);
   }
 
@@ -115,7 +123,7 @@ class CategoryService {
    */
   async getCategoryChildren(id) {
     const category = await this.findCategoryByIdentifier(id);
-    return CategoryRepository.getChildren(category._id);
+    return CategoryRepository.getChildren(category.id || category._id);
   }
 
   async findCategoryByIdentifier(identifier) {
