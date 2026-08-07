@@ -1,0 +1,19 @@
+const Admin = require('.');
+const Product = require('./Product');
+const Category = require('./Category');
+const Collection = require('./Collection');
+const Order = require('./Order');
+const Customer = require('./Customer');
+const { Inventory, LowStockAlert } = require('./Inventory');
+
+module.exports = {
+  Admin,
+  Product,
+  Category,
+  Collection,
+  Order,
+  Customer,
+  Inventory,
+  LowStockAlert,
+};
+
