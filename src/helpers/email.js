@@ -43,7 +43,7 @@ async function sendAdminResetEmail({ email, resetToken }) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset - Aytin Admin</title>
+<title>Password Reset - VELU'S FASHTOWN Admin</title>
   <style>
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 0; }
     .container { max-width: 560px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -65,12 +65,12 @@ async function sendAdminResetEmail({ email, resetToken }) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Aytin</h1>
+<h1>VELU'S FASHTOWN</h1>
       <p>Admin Panel</p>
     </div>
     <div class="body">
       <h2>Password Reset Request</h2>
-      <p>We received a request to reset the password for your <strong>admin account</strong> at Aytin.</p>
+<p>We received a request to reset the password for your <strong>admin account</strong> at VELU'S FASHTOWN.</p>
       <p>Click the button below to set a new password. This link is valid for <strong>15 minutes</strong>.</p>
       <div class="btn-wrap">
         <a class="btn" href="${resetUrl}" target="_blank">Reset Password</a>
@@ -83,7 +83,7 @@ async function sendAdminResetEmail({ email, resetToken }) {
       </div>
     </div>
     <div class="footer">
-      <p>&copy; ${new Date().getFullYear()} Aytin. All rights reserved.</p>
+<p>&copy; ${new Date().getFullYear()} VELU'S FASHTOWN. All rights reserved.</p>
       <p>This is an automated message. Please do not reply.</p>
     </div>
   </div>
@@ -92,7 +92,7 @@ async function sendAdminResetEmail({ email, resetToken }) {
 
   return sendMail({
     to: email,
-    subject: 'Password Reset - Aytin Admin',
+subject: "Password Reset - VELU'S FASHTOWN Admin",
     html,
   });
 }

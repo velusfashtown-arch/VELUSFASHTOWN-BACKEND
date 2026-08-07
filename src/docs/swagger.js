@@ -4,10 +4,10 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Aytin eCommerce API',
+title: "VELU'S FASHTOWN eCommerce API",
       version: '1.0.0',
       description: `
-        Production-ready eCommerce backend for Aytin.
+Production-ready eCommerce backend for VELU'S FASHTOWN.
         
         ## Features
         - Admin Authentication (JWT + Refresh Tokens)
@@ -22,8 +22,8 @@ const options = {
         - Inventory & Low Stock Alerts
       `,
       contact: {
-        name: 'Aytin Support',
-        email: 'support@aytin.com',
+name: "VELU'S FASHTOWN Support",
+        email: 'support@velusfashtown.com',
       },
     },
     servers: [
@@ -77,7 +77,7 @@ const options = {
           type: 'object',
           required: ['email', 'password'],
           properties: {
-            email: { type: 'string', format: 'email', example: 'admin@aytin.com' },
+email: { type: 'string', format: 'email', example: 'admin@velusfashtown.com' },
             password: { type: 'string', format: 'password', example: 'Admin@123' },
           },
         },

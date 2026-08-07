@@ -29,7 +29,7 @@ const createTransport = () => {
 
 const getTransport = () => transport;
 
-const FROM = () => process.env.MAIL_FROM || '"Aytin" <noreply@aytin.com>';
+const FROM = () => process.env.MAIL_FROM || '"VELU\'S FASHTOWN" <noreply@velusfashtown.com>';
 const FRONTEND_URL = () => (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
 module.exports = { createTransport, getTransport, FROM, FRONTEND_URL };

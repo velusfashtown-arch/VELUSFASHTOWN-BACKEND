@@ -114,7 +114,7 @@ class UploadService {
   /**
    * Upload file to Cloudinary.
    */
-  async uploadToCloudinary(filePath, folder = 'aytin') {
+async uploadToCloudinary(filePath, folder = 'velusfashtown') {
     if (!this.useCloudinary) {
       return { url: this.buildLocalUrl(filePath), publicId: '' };
     }
@@ -151,7 +151,7 @@ class UploadService {
    * Cloudinary folder the same way the local disk folder is organized.
    */
   async uploadMultiple(files, productId) {
-    const folder = productId ? `aytin/products/${productId}` : 'aytin';
+const folder = productId ? `velusfashtown/products/${productId}` : 'velusfashtown';
     const results = [];
 
     for (const file of files) {

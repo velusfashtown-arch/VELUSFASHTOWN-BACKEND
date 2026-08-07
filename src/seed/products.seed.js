@@ -28,7 +28,7 @@ async function seedProducts() {
 
   const products = [
     {
-      name: "Aytin Banarasi Silk Saree - Zari Border",
+name: "VELU'S FASHTOWN Banarasi Silk Saree - Zari Border",
       sku: "AYT-SAR-BAN-001",
       description: "Premium Banarasi silk saree with intricate zari border work. Perfect for weddings and festive occasions.",
       shortDescription: "Banarasi silk with zari border",
@@ -53,7 +53,7 @@ async function seedProducts() {
       tags: ['banarasi', 'silk', 'zari', 'wedding', 'festival'],
     },
     {
-      name: "Aytin Cotton Handloom Saree - Daily Wear",
+name: "VELU'S FASHTOWN Cotton Handloom Saree - Daily Wear",
       sku: "AYT-SAR-COT-002",
       description: "Lightweight and breathable handloom cotton saree for daily comfort.",
       shortDescription: "Handloom cotton for daily wear",
@@ -77,7 +77,7 @@ async function seedProducts() {
       tags: ['cotton', 'handloom', 'daily', 'casual'],
     },
     {
-      name: "Aytin Georgette Embroidered Saree - Festive",
+name: "VELU'S FASHTOWN Georgette Embroidered Saree - Festive",
       sku: "AYT-SAR-GEO-003",
       description: "Elegant georgette saree with beautiful embroidery work for festive occasions.",
       shortDescription: "Embroidered georgette saree",
@@ -101,7 +101,7 @@ async function seedProducts() {
       tags: ['georgette', 'embroidered', 'festive', 'party'],
     },
     {
-      name: "Aytin Chiffon Saree - Everyday Elegance",
+name: "VELU'S FASHTOWN Chiffon Saree - Everyday Elegance",
       sku: "AYT-SAR-CHI-004",
       description: "Soft and flowy chiffon saree perfect for office and casual events.",
       shortDescription: "Lightweight chiffon saree",
