@@ -75,14 +75,21 @@ class ProductService {
     });
   }
 
-  /**
+/**
    * Get single product by its customer-facing productId (e.g. "PRD00001"),
-   * falling back to the Mongo _id (admin still looks products up by _id).
+   * falling back to the Mongo _id and then the slug. The storefront passes
+   * the public id (productId / _id) in URLs, but legacy links may use a slug.
    */
   async getProduct(id) {
-    const product = await ProductRepository.findByPublicId(id, {
+    let product = await ProductRepository.findByPublicId(id, {
       populate: 'category collection subCategory',
     });
+    if (!product) {
+      product = await ProductRepository.findOne(
+        { slug: id, isDeleted: false, isActive: true },
+        { populate: 'category collection subCategory' }
+      ).catch(() => null);
+    }
     if (!product) {
       throw AppError.notFound('Product not found');
     }

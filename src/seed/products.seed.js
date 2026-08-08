@@ -141,15 +141,18 @@ name: "VELU'S FASHTOWN Chiffon Saree - Everyday Elegance",
     },
   ];
 
-// insertMany bypasses the Mongoose pre('save') hook, so generate a unique
+  // insertMany bypasses the Mongoose pre('save') hook, so generate a unique
   // slug for each product here (the slug field has a unique index and must
-  // not be null for multiple documents).
-  const withSlugs = products.map((product) => ({
+  // not be null for multiple documents). Also ensure every seeded product
+  // has a customer-facing productId (the storefront uses it as the public
+  // id — e.g. in URLs, cart, wishlist and order placement).
+  const withSlugsAndIds = products.map((product, index) => ({
     ...product,
+    productId: product.productId || `PRD${String(index + 1).padStart(5, '0')}`,
     slug: generateSlug(product.name),
   }));
 
-  await Product.insertMany(withSlugs);
+await Product.insertMany(withSlugsAndIds);
   logger.info(`Seeded ${products.length} products`);
 }
 
