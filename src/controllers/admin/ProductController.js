@@ -2,6 +2,16 @@ const ProductService = require('../../services/ProductService');
 const asyncHandler = require('../../utils/asyncHandler');
 const ApiResponse = require('../../utils/response');
 
+// The Mongo _id should never reach the admin UI as `id` — every product
+// response's `id` must be the human-readable productId (e.g. "PRD00002").
+// Handles both lean plain objects (already _id->id stripped) and raw
+// Mongoose documents (toJSON() applies the same _id->id swap first).
+function withProductId(product) {
+  if (!product) return product;
+  const plain = typeof product.toJSON === 'function' ? product.toJSON() : product;
+  return { ...plain, id: plain.productId || plain.id };
+}
+
 class ProductController {
   reserveId = asyncHandler(async (req, res) => {
     const productId = await ProductService.reserveProductId();
@@ -11,7 +21,7 @@ class ProductController {
   listAll = asyncHandler(async (req, res) => {
     const result = await ProductService.listAllProducts(req.query);
     return ApiResponse.paginated(res, {
-      data: result.data,
+      data: result.data.map(withProductId),
       total: result.pagination.total,
       page: result.pagination.page,
       limit: result.pagination.limit,
@@ -20,27 +30,27 @@ class ProductController {
 
   getById = asyncHandler(async (req, res) => {
     const product = await ProductService.getProduct(req.params.id);
-    return ApiResponse.success(res, { data: product });
+    return ApiResponse.success(res, { data: withProductId(product) });
   });
 
   create = asyncHandler(async (req, res) => {
     const product = await ProductService.createProduct(req.body);
-    return ApiResponse.created(res, { data: product, message: 'Product created successfully' });
+    return ApiResponse.created(res, { data: withProductId(product), message: 'Product created successfully' });
   });
 
   update = asyncHandler(async (req, res) => {
     const product = await ProductService.updateProduct(req.params.id, req.body);
-    return ApiResponse.success(res, { data: product, message: 'Product updated successfully' });
+    return ApiResponse.success(res, { data: withProductId(product), message: 'Product updated successfully' });
   });
 
   softDelete = asyncHandler(async (req, res) => {
     const product = await ProductService.softDeleteProduct(req.params.id);
-    return ApiResponse.success(res, { data: product, message: 'Product moved to trash' });
+    return ApiResponse.success(res, { data: withProductId(product), message: 'Product moved to trash' });
   });
 
   restore = asyncHandler(async (req, res) => {
     const product = await ProductService.restoreProduct(req.params.id);
-    return ApiResponse.success(res, { data: product, message: 'Product restored successfully' });
+    return ApiResponse.success(res, { data: withProductId(product), message: 'Product restored successfully' });
   });
 
   permanentDelete = asyncHandler(async (req, res) => {
@@ -50,17 +60,17 @@ class ProductController {
 
   publish = asyncHandler(async (req, res) => {
     const product = await ProductService.publishProduct(req.params.id);
-    return ApiResponse.success(res, { data: product, message: 'Product published' });
+    return ApiResponse.success(res, { data: withProductId(product), message: 'Product published' });
   });
 
   unpublish = asyncHandler(async (req, res) => {
     const product = await ProductService.unpublishProduct(req.params.id);
-    return ApiResponse.success(res, { data: product, message: 'Product unpublished' });
+    return ApiResponse.success(res, { data: withProductId(product), message: 'Product unpublished' });
   });
 
   duplicate = asyncHandler(async (req, res) => {
     const product = await ProductService.duplicateProduct(req.params.id);
-    return ApiResponse.created(res, { data: product, message: 'Product duplicated' });
+    return ApiResponse.created(res, { data: withProductId(product), message: 'Product duplicated' });
   });
 
   bulkOperation = asyncHandler(async (req, res) => {

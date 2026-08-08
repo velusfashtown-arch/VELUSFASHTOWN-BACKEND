@@ -150,10 +150,14 @@ class ProductService {
    * Update a product.
    */
   async updateProduct(id, data) {
-    const product = await ProductRepository.findById(id);
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    const mongoId = existing.id;
 
     // Regenerate slug if name changed
-    if (data.name && data.name !== product.name) {
+    if (data.name && data.name !== existing.name) {
       data.slug = generateSlug(data.name);
     }
 
@@ -161,15 +165,15 @@ class ProductService {
     if (data.subCategory !== undefined) data.subCategory = await resolveCategoryRef(data.subCategory);
 
     // Recalculate profit margin if prices changed
-    const finalSellingPrice = data.sellingPrice ?? product.sellingPrice;
-    const finalCostPrice = data.costPrice ?? product.costPrice;
+    const finalSellingPrice = data.sellingPrice ?? existing.sellingPrice;
+    const finalCostPrice = data.costPrice ?? existing.costPrice;
     if (data.sellingPrice !== undefined || data.costPrice !== undefined) {
       if (finalCostPrice > 0 && finalSellingPrice > 0) {
         data.profitMargin = ((finalSellingPrice - finalCostPrice) / finalSellingPrice) * 100;
       }
     }
 
-    const updated = await ProductRepository.updateById(id, data);
+    const updated = await ProductRepository.updateById(mongoId, data);
     logger.info(`Product updated: ${updated.name}`);
     return updated;
   }
@@ -178,7 +182,11 @@ class ProductService {
    * Soft delete a product.
    */
   async softDeleteProduct(id) {
-    const product = await ProductRepository.updateById(id, {
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    const product = await ProductRepository.updateById(existing.id, {
       isDeleted: true,
       deletedAt: new Date(),
       isActive: false,
@@ -191,11 +199,11 @@ class ProductService {
    * Restore a soft-deleted product.
    */
   async restoreProduct(id) {
-    const existing = await ProductRepository.findOne({ _id: id, isDeleted: true });
-    if (!existing) {
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing || !existing.isDeleted) {
       throw AppError.notFound('Deleted product not found');
     }
-    const product = await ProductRepository.updateById(id, {
+    const product = await ProductRepository.updateById(existing.id, {
       isDeleted: false,
       deletedAt: null,
       isActive: true,
@@ -208,30 +216,45 @@ class ProductService {
    * Permanently delete a product.
    */
   async permanentDeleteProduct(id) {
-    const product = await ProductRepository.findById(id);
-    await ProductRepository.deleteById(id);
-    logger.info(`Product permanently deleted: ${product.name}`);
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    await ProductRepository.deleteById(existing.id);
+    logger.info(`Product permanently deleted: ${existing.name}`);
   }
 
   /**
    * Publish a product.
    */
   async publishProduct(id) {
-    return ProductRepository.updateById(id, { status: PRODUCT_STATUS.PUBLISHED, isActive: true });
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.PUBLISHED, isActive: true });
   }
 
   /**
    * Unpublish a product.
    */
   async unpublishProduct(id) {
-    return ProductRepository.updateById(id, { status: PRODUCT_STATUS.UNPUBLISHED, isActive: false });
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.UNPUBLISHED, isActive: false });
   }
 
   /**
    * Duplicate a product.
    */
   async duplicateProduct(id) {
-    const product = await ProductRepository.duplicateProduct(id);
+    const existing = await ProductRepository.findAnyByPublicId(id);
+    if (!existing) {
+      throw AppError.notFound('Product not found');
+    }
+    const product = await ProductRepository.duplicateProduct(existing.id);
     if (!product) {
       throw AppError.notFound('Product not found');
     }

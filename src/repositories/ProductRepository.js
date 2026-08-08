@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const BaseRepository = require('./BaseRepository');
 const Product = require('../models/admin/Product');
+const { generateProductId } = require('../utils/idGenerator');
 
 class ProductRepository extends BaseRepository {
   constructor() {
@@ -127,6 +128,7 @@ class ProductRepository extends BaseRepository {
 
     const productObj = product.toObject();
     delete productObj._id;
+    delete productObj.productId;
     delete productObj.slug;
     delete productObj.sku;
     delete productObj.createdAt;
@@ -138,6 +140,7 @@ class ProductRepository extends BaseRepository {
     productObj.name = `${productObj.name} (Copy)`;
     productObj.isActive = false;
     productObj.status = 'Draft';
+    productObj.productId = await generateProductId();
 
     return this.model.create(productObj);
   }
@@ -175,6 +178,25 @@ class ProductRepository extends BaseRepository {
    */
   async findByPublicId(publicId, options = {}) {
     const byProductId = await this.findOne({ productId: publicId, isDeleted: false }, options);
+    if (byProductId) return byProductId;
+    if (mongoose.Types.ObjectId.isValid(publicId)) {
+      try {
+        return await this.findById(publicId, options);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Same as findByPublicId but without the isDeleted filter — used by
+   * admin mutation endpoints (update, delete, restore, publish, etc.)
+   * which must be able to target a product regardless of its deleted
+   * state (e.g. restoring a soft-deleted product by its productId).
+   */
+  async findAnyByPublicId(publicId, options = {}) {
+    const byProductId = await this.findOne({ productId: publicId }, options);
     if (byProductId) return byProductId;
     if (mongoose.Types.ObjectId.isValid(publicId)) {
       try {
