@@ -12,6 +12,10 @@ router.use('/website/auth', websiteAuthRoutes);
 router.use('/website/orders', websiteOrderRoutes);
 router.use('/website/payments', websitePaymentRoutes);
 
+// ─── Storefront Routes (Multi-Website) ────────────────────────────────
+const storefrontRoutes = require('./storefront/index.routes');
+router.use('/storefront', storefrontRoutes);
+
 // ─── Admin Routes (Private) ───────────────────────────────────────────
 const adminAuthRoutes = require('./admin/auth.routes');
 const adminProductRoutes = require('./admin/product.routes');
@@ -23,6 +27,7 @@ const adminDashboardRoutes = require('./admin/dashboard.routes');
 const adminUploadRoutes = require('./admin/upload.routes');
 const adminSearchRoutes = require('./admin/search.routes');
 const adminShippingRoutes = require('./admin/shipping.routes');
+const adminWebsiteRoutes = require('./admin/website.routes');
 
 router.use('/admin/auth', adminAuthRoutes);
 router.use('/admin/products', adminProductRoutes);
@@ -34,5 +39,6 @@ router.use('/admin/dashboard', adminDashboardRoutes);
 router.use('/admin/upload', adminUploadRoutes);
 router.use('/admin/search', adminSearchRoutes);
 router.use('/admin/shipping', adminShippingRoutes);
+router.use('/admin/websites', adminWebsiteRoutes);
 
 module.exports = router;

@@ -22,9 +22,9 @@ router.get('/', CategoryController.list);
 router.get('/tree', CategoryController.getTree);
 router.get('/:id', CategoryController.getById);
 router.get('/:id/children', CategoryController.getChildren);
-router.post('/', authorize(ROLES.ADMIN, ROLES.MANAGER), validate(createCategorySchema), CategoryController.create);
-router.put('/:id', authorize(ROLES.ADMIN, ROLES.MANAGER), validate(updateCategorySchema), CategoryController.update);
-router.delete('/:id', authorize(ROLES.ADMIN, ROLES.MANAGER), CategoryController.delete);
+router.post('/', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), validate(createCategorySchema), CategoryController.create);
+router.put('/:id', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), validate(updateCategorySchema), CategoryController.update);
+router.delete('/:id', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), CategoryController.delete);
 
 module.exports = router;
 

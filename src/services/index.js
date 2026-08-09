@@ -7,6 +7,9 @@ const CustomerService = require('./CustomerService');
 const DashboardService = require('./DashboardService');
 const UploadService = require('./UploadService');
 const SearchService = require('./SearchService');
+const WebsiteService = require('./WebsiteService');
+const WebsiteProductService = require('./WebsiteProductService');
+const WebsiteContentService = require('./WebsiteContentService');
 
 module.exports = {
   AuthService,
@@ -18,5 +21,8 @@ module.exports = {
   DashboardService,
   UploadService,
   SearchService,
+  WebsiteService,
+  WebsiteProductService,
+  WebsiteContentService,
 };
 

@@ -16,7 +16,7 @@ router.get('/couriers', (req, res) => {
 });
 
 // POST /api/admin/shipping/:orderId/shiprocket/push - Push order to Shiprocket, assign AWB
-router.post('/:orderId/shiprocket/push', authorize(ROLES.ADMIN, ROLES.MANAGER), asyncHandler(async (req, res) => {
+router.post('/:orderId/shiprocket/push', authorize(ROLES.ADMIN, ROLES.ORDER_MANAGER), asyncHandler(async (req, res) => {
   if (!isShiprocketConfigured()) {
     return ApiResponse.badRequest(res, { message: 'Shiprocket is not configured. Add SHIPROCKET_EMAIL/PASSWORD/PICKUP_LOCATION to the backend .env.' });
   }
@@ -76,7 +76,7 @@ router.get('/:orderId/shiprocket/track', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/admin/shipping/:orderId/assign - Assign courier
-router.post('/:orderId/assign', authorize(ROLES.ADMIN, ROLES.MANAGER), asyncHandler(async (req, res) => {
+router.post('/:orderId/assign', authorize(ROLES.ADMIN, ROLES.ORDER_MANAGER), asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { courierName, trackingNumber, awbNumber } = req.body;
 
@@ -101,7 +101,7 @@ router.post('/:orderId/assign', authorize(ROLES.ADMIN, ROLES.MANAGER), asyncHand
 }));
 
 // POST /api/admin/shipping/:orderId/rto - Manage RTO
-router.post('/:orderId/rto', authorize(ROLES.ADMIN, ROLES.MANAGER), asyncHandler(async (req, res) => {
+router.post('/:orderId/rto', authorize(ROLES.ADMIN, ROLES.ORDER_MANAGER), asyncHandler(async (req, res) => {
   const { orderId } = req.params;
   const { rtoStatus, rtoReason, rtoTrackingNumber, rtoCourierName } = req.body;
 

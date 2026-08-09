@@ -5,7 +5,7 @@ const { authenticate, authorize, uploadLimiter } = require('../../middleware');
 const { ROLES } = require('../../constants');
 
 router.use(authenticate);
-router.use(authorize(ROLES.ADMIN, ROLES.MANAGER));
+router.use(authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER));
 
 const uploadMiddleware = UploadController.getUploadMiddleware();
 

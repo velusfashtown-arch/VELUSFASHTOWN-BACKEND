@@ -11,7 +11,7 @@ router.get('/', OrderController.list);
 router.get('/stats', OrderController.getStats);
 router.get('/counts', OrderController.getCounts);
 router.get('/:id', OrderController.getById);
-router.patch('/:id/status', authorize(ROLES.ADMIN, ROLES.MANAGER), validate(updateOrderStatusSchema), OrderController.updateStatus);
+router.patch('/:id/status', authorize(ROLES.ADMIN, ROLES.ORDER_MANAGER), validate(updateOrderStatusSchema), OrderController.updateStatus);
 router.delete('/:id', authorize(ROLES.ADMIN), OrderController.delete);
 
 module.exports = router;

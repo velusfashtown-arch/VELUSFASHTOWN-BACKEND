@@ -27,7 +27,7 @@ const AdminSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: Object.values(ROLES),
-      default: ROLES.EMPLOYEE,
+      default: ROLES.SUPPORT_MANAGER,
     },
     refreshToken: {
       type: String,

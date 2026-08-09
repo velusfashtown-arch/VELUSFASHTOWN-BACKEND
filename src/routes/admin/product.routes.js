@@ -35,10 +35,10 @@ router.use(authenticate);
  */
 
 router.get('/', ProductController.listAll);
-router.post('/reserve-id', authorize(ROLES.ADMIN, ROLES.MANAGER), ProductController.reserveId);
+router.post('/reserve-id', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), ProductController.reserveId);
 router.get('/:id', ProductController.getById);
-router.post('/', authorize(ROLES.ADMIN, ROLES.MANAGER), validate(createProductSchema), ProductController.create);
-router.put('/:id', authorize(ROLES.ADMIN, ROLES.MANAGER), validate(updateProductSchema), ProductController.update);
+router.post('/', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), validate(createProductSchema), ProductController.create);
+router.put('/:id', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), validate(updateProductSchema), ProductController.update);
 router.delete('/:id', authorize(ROLES.ADMIN), ProductController.softDelete);
 
 // Bulk operations
@@ -47,9 +47,9 @@ router.post('/bulk', authorize(ROLES.ADMIN), validate(bulkProductSchema), Produc
 // Product actions
 router.post('/:id/restore', authorize(ROLES.ADMIN), ProductController.restore);
 router.delete('/:id/permanent', authorize(ROLES.ADMIN), ProductController.permanentDelete);
-router.post('/:id/publish', authorize(ROLES.ADMIN, ROLES.MANAGER), ProductController.publish);
-router.post('/:id/unpublish', authorize(ROLES.ADMIN, ROLES.MANAGER), ProductController.unpublish);
-router.post('/:id/duplicate', authorize(ROLES.ADMIN, ROLES.MANAGER), ProductController.duplicate);
+router.post('/:id/publish', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), ProductController.publish);
+router.post('/:id/unpublish', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), ProductController.unpublish);
+router.post('/:id/duplicate', authorize(ROLES.ADMIN, ROLES.CATALOG_MANAGER), ProductController.duplicate);
 
 // No flag routes - removed as per requirements
 

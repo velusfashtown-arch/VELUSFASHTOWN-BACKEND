@@ -78,3 +78,54 @@
 ## Phase 10: Seed & Final
 - [x] Enhanced seed scripts
 - [x] Swagger API docs
+
+---
+
+# MULTI-WEBSITE / MULTI-TENANT PLATFORM
+
+## PHASE 1: Multi-Website Foundation (DONE)
+- [x] Website model (theme, contact, social, SEO, shipping/payment config, domain)
+- [x] WebsiteDomain model
+- [x] WebsiteProduct model (assignment: websiteTitle/Desc/Price/SEO/featured/order)
+- [x] WebsiteProductApproval model (approval history)
+- [x] HomepageSection model
+- [x] Navigation + NavigationItem models
+- [x] Banner model
+- [x] Coupon, Offer models
+- [x] Review model
+- [x] Page, BlogPost (+ BlogCategory) models
+- [x] AuditLog, Notification models
+- [x] Role, Permission, RolePermission models
+- [x] models/tenant/index.js aggregator
+- [x] WebsiteRepository, WebsiteProductRepository
+- [x] resolveWebsite middleware (hostname → domain → slug → default)
+- [x] optionalResolveWebsite middleware
+- [x] WebsiteService, WebsiteProductService (assign/approve/reject/publish/unpublish)
+- [x] Admin WebsiteController, WebsiteProductController
+- [x] routes/admin/website.routes.js (CRUD + assign/unassign + approve/reject/publish/unpublish)
+- [x] StorefrontController (website-scoped, approved+published only)
+- [x] routes/storefront/index.routes.js (resolveWebsite)
+- [x] routes/index.js registration (storefront + admin/websites)
+- [x] Constants/enums (ROLES, APPROVAL_STATUS, WEBSITE_STATUS, PERMISSIONS, etc.)
+- [x] ROLES corrected to SUPER_ADMIN/ADMIN/CATALOG_MANAGER/ORDER_MANAGER/etc.
+- [x] All route role references updated (product→CATALOG_MANAGER, order/shipping→ORDER_MANAGER, upload→CATALOG_MANAGER, category/collection→CATALOG_MANAGER, customer→ORDER_MANAGER)
+- [x] website.seed.js (default VELU'S FASHTOWN + backfill existing products)
+- [x] seed/index.js wired
+- [x] Duplicate index warnings cleaned (Website, WebsiteDomain, Coupon)
+- [x] Backend module graph loads cleanly
+
+## PHASE 1b: Website Content Management (Homepage / Navigation / Banners) — DONE
+- [x] WebsiteContentService (homepage sections CRUD/reorder/duplicate, navigation items, banners)
+- [x] WebsiteContentController (admin endpoints)
+- [x] routes/admin/website.routes.js — homepage/navigation/banner routes (CONTENT_MANAGER access)
+- [x] services/index.js registered WebsiteContentService
+- [x] Admin frontend API methods for homepage/navigation/banners
+- [x] node --check passes on new backend files
+
+<!-- PHASE 2: Product management (variants, colors, images, categories, collections, inventory) - NEXT -->
+<!-- PHASE 3: Multi-website theme + settings + homepage builder + navigation builder -->
+<!-- PHASE 4: Multi-website storefront (website-aware React) -->
+<!-- PHASE 5: Cart + checkout + orders -->
+<!-- PHASE 6: CMS + SEO + blogs -->
+<!-- PHASE 7: Analytics + notifications + audit logs -->
+<!-- PHASE 8: Testing + security + production hardening -->

@@ -1,5 +1,6 @@
 const { authenticate, authorize, optionalAuth } = require('./auth');
 const { authenticateCustomer, optionalCustomer } = require('./customerAuth');
+const { resolveWebsite, optionalResolveWebsite } = require('./resolveWebsite');
 const errorHandler = require('./errorHandler');
 const { validate } = require('./validate');
 const { apiLimiter, authLimiter, uploadLimiter } = require('./rateLimiter');
@@ -12,6 +13,8 @@ module.exports = {
   optionalAuth,
   authenticateCustomer,
   optionalCustomer,
+  resolveWebsite,
+  optionalResolveWebsite,
   errorHandler,
   validate,
   apiLimiter,

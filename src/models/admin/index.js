@@ -6,6 +6,8 @@ const Order = require('./Order');
 const Customer = require('./Customer');
 const { Inventory, LowStockAlert } = require('./Inventory');
 
+const tenantModels = require('../tenant');
+
 module.exports = {
   Admin,
   Product,
@@ -15,5 +17,6 @@ module.exports = {
   Customer,
   Inventory,
   LowStockAlert,
+  ...tenantModels,
 };
 

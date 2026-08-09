@@ -180,11 +180,11 @@ const admin = await AdminRepository.findByEmail(decoded.email);
       throw AppError.conflict('An admin with this email already exists');
     }
 
-    const admin = await AdminRepository.create({
+const admin = await AdminRepository.create({
       name: data.name,
       email: data.email,
       password: data.password,
-      role: data.role || ROLES.EMPLOYEE,
+      role: data.role || ROLES.SUPPORT_MANAGER,
       phone: data.phone || '',
     });
 

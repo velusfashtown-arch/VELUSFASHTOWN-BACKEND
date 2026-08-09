@@ -4,7 +4,7 @@ const logger = require('../utils/logger');
 const { ROLES } = require('../constants');
 
 async function seedAdmin() {
-const email = process.env.ADMIN_EMAIL || 'admin@velusfashtown.com';
+  const email = process.env.ADMIN_EMAIL || 'admin@velusfashtown.com';
   const password = process.env.ADMIN_PASSWORD || 'Admin@123';
   const forceReset = String(process.env.ADMIN_FORCE_RESET || '').toLowerCase() === 'true';
 
