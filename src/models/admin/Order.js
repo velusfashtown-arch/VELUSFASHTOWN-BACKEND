@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { ORDER_STATUS, PAYMENT_METHODS, PAYMENT_STATUS, RTO_STATUS } = require('../../constants');
+const { adminConnection } = require('../../config/connections');
 
 // ─── Order Item Sub-Schema ──────────────────────────────────────────────
 const OrderItemSchema = new mongoose.Schema(
@@ -199,5 +200,5 @@ OrderSchema.methods.markPaid = function (transactionId = '') {
   return this.save();
 };
 
-module.exports = mongoose.model('Order', OrderSchema);
+module.exports = adminConnection.model('Order', OrderSchema);
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Website Product Approval History ────────────────────────────────
 // Append-only log of every assignment / approval / publish action.
@@ -46,4 +47,4 @@ const WebsiteProductApprovalSchema = new mongoose.Schema(
 
 WebsiteProductApprovalSchema.index({ website: 1, product: 1, createdAt: -1 });
 
-module.exports = mongoose.model('WebsiteProductApproval', WebsiteProductApprovalSchema);
+module.exports = websiteConnection.model('WebsiteProductApproval', WebsiteProductApprovalSchema);

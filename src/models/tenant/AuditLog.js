@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Audit Log Schema ────────────────────────────────────────────────
 // Append-only audit trail of admin actions.
@@ -34,4 +35,4 @@ AuditLogSchema.index({ module: 1, action: 1 });
 AuditLogSchema.index({ entity: 1, entityId: 1 });
 AuditLogSchema.index({ createdAt: -1 });
 
-module.exports = mongoose.model('AuditLog', AuditLogSchema);
+module.exports = websiteConnection.model('AuditLog', AuditLogSchema);

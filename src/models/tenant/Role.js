@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Role Schema ─────────────────────────────────────────────────────
 const RoleSchema = new mongoose.Schema(
@@ -13,4 +14,4 @@ const RoleSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Role', RoleSchema);
+module.exports = websiteConnection.model('Role', RoleSchema);

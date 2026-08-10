@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { OFFER_TYPES } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Offer Schema ────────────────────────────────────────────────────
 // Website-specific promotional offers.
@@ -39,4 +40,4 @@ const OfferSchema = new mongoose.Schema(
 
 OfferSchema.index({ website: 1, isActive: 1 });
 
-module.exports = mongoose.model('Offer', OfferSchema);
+module.exports = websiteConnection.model('Offer', OfferSchema);

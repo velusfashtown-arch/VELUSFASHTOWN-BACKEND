@@ -1,11 +1,11 @@
-const { seedAdmin } = require('./admin.seed');
+const { seedAuth } = require('./admin/auth/auth.seed');
 const { seedProducts } = require('./products.seed');
 const { seedWebsites } = require('./website.seed');
 const logger = require('../utils/logger');
 
 async function runSeeds() {
   try {
-    await seedAdmin();
+    await seedAuth();
     await seedProducts();
     await seedWebsites();
   } catch (err) {

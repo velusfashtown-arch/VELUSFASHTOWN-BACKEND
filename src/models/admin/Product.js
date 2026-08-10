@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const { STOCK_STATUS, PRODUCT_STATUS } = require('../../constants');
+const { adminConnection } = require('../../config/connections');
 
 // ─── Video Sub-Schema ───────────────────────────────────────────────────
 const VideoSchema = new mongoose.Schema(
@@ -257,4 +258,4 @@ ProductSchema.methods.unpublish = function () {
   return this.save();
 };
 
-module.exports = mongoose.model('Product', ProductSchema);
+module.exports = adminConnection.model('Product', ProductSchema);

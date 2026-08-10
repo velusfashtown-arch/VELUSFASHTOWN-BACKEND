@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Blog Category Schema ────────────────────────────────────────────
 const BlogCategorySchema = new mongoose.Schema(
@@ -46,6 +47,6 @@ BlogPostSchema.index({ website: 1, slug: 1 }, { unique: true });
 BlogPostSchema.index({ website: 1, status: 1, publishedAt: -1 });
 
 module.exports = {
-  BlogPost: mongoose.model('BlogPost', BlogPostSchema),
-  BlogCategory: mongoose.model('BlogCategory', BlogCategorySchema),
+  BlogPost: websiteConnection.model('BlogPost', BlogPostSchema),
+  BlogCategory: websiteConnection.model('BlogCategory', BlogCategorySchema),
 };

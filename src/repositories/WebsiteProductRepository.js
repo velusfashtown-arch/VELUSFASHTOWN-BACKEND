@@ -1,6 +1,8 @@
 const BaseRepository = require('./BaseRepository');
 const WebsiteProduct = require('../models/tenant/WebsiteProduct');
 const WebsiteProductApproval = require('../models/tenant/WebsiteProductApproval');
+const Product = require('../models/admin/Product');
+const Auth = require('../models/admin/auth/auth');
 const { APPROVAL_STATUS } = require('../constants');
 
 class WebsiteProductRepository extends BaseRepository {
@@ -30,12 +32,24 @@ class WebsiteProductRepository extends BaseRepository {
 
   /**
    * List assignments for a website, optionally filtered by status.
+   *
+   * `product` lives in the admin database (a separate mongoose connection
+   * from WebsiteProduct), so it's batch-fetched and attached manually
+   * instead of via `.populate()`.
    */
   async listByWebsite(websiteId, options = {}) {
-    const { status, page = 1, limit = 50, populate = 'product website' } = options;
+    const { status, page = 1, limit = 50, populate = 'website' } = options;
     const filter = { website: websiteId };
     if (status) filter.approvalStatus = status;
-    return this.findAll(filter, { sort: { displayOrder: 1, createdAt: -1 }, page, limit, populate });
+    const result = await this.findAll(filter, { sort: { displayOrder: 1, createdAt: -1 }, page, limit, populate });
+
+    const productIds = [...new Set(result.data.map((d) => String(d.product)).filter(Boolean))];
+    if (productIds.length > 0) {
+      const products = await Product.find({ _id: { $in: productIds } }).lean();
+      const productMap = new Map(products.map((p) => [String(p._id), p]));
+      result.data = result.data.map((d) => ({ ...d, product: productMap.get(String(d.product)) || d.product }));
+    }
+    return result;
   }
 
   /**
@@ -63,12 +77,23 @@ class WebsiteProductRepository extends BaseRepository {
 
   /**
    * Get approval history for a website-product pair.
+   *
+   * `actionedBy` refs Auth, which lives in the admin database (a separate
+   * mongoose connection from WebsiteProductApproval), so it's batch-fetched
+   * and attached manually instead of via `.populate()`.
    */
   async getHistory(websiteId, productId) {
-    return WebsiteProductApproval.find({ website: websiteId, product: productId })
+    const history = await WebsiteProductApproval.find({ website: websiteId, product: productId })
       .sort({ createdAt: -1 })
-      .populate('actionedBy', 'name email')
       .lean();
+
+    const adminIds = [...new Set(history.map((h) => String(h.actionedBy)).filter(Boolean))];
+    const admins = adminIds.length > 0
+      ? await Auth.find({ _id: { $in: adminIds } }).select('name email').lean()
+      : [];
+    const adminMap = new Map(admins.map((a) => [String(a._id), a]));
+
+    return history.map((h) => ({ ...h, actionedBy: adminMap.get(String(h.actionedBy)) || h.actionedBy }));
   }
 }
 

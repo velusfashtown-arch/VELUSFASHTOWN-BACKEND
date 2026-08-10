@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Admin = require('../models/admin/Admin');
+const Auth = require('../models/admin/auth/auth');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { ROLES, ROLE_HIERARCHY } = require('../constants');
@@ -26,9 +26,9 @@ const authenticate = asyncHandler(async (req, res, next) => {
     throw AppError.unauthorized('Invalid access token');
   }
 
-  const admin = await Admin.findById(decoded.adminId).select('-password -refreshToken');
+  const admin = await Auth.findById(decoded.adminId).select('-password');
   if (!admin) {
-    throw AppError.unauthorized('Admin not found');
+    throw AppError.unauthorized('Auth not found');
   }
   if (!admin.isActive) {
     throw AppError.forbidden('Admin account is deactivated');
@@ -99,7 +99,7 @@ const optionalAuth = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Admin.findById(decoded.adminId).select('-password -refreshToken');
+    const admin = await Auth.findById(decoded.adminId).select('-password');
     if (admin && admin.isActive) {
       req.admin = admin;
       req.adminId = admin._id.toString();

@@ -8,13 +8,15 @@ const logger = require('../utils/logger');
  *        validate(schema, 'params') - validates req.params
  */
 const validate = (schema, source = 'body') => {
+  // Check if schema expects a nested object (e.g., { body: z.object({...}) })
+  // or a flat object (e.g., z.object({...})) — determined once per schema,
+  // not per request, and kept outside try/catch so it's visible to the
+  // error handler below.
+  const schemaShape = schema.shape || {};
+  const hasSourceWrapper = Object.keys(schemaShape).length === 1 && schemaShape[source];
+
   return (req, res, next) => {
     try {
-      // Check if schema expects a nested object (e.g., { body: z.object({...}) })
-      // or a flat object (e.g., z.object({...}))
-      const schemaShape = schema.shape || {};
-      const hasSourceWrapper = Object.keys(schemaShape).length === 1 && schemaShape[source];
-
       let parsed;
       if (hasSourceWrapper) {
         // Schema wraps with source key: { body: z.object({...}) }
@@ -28,7 +30,7 @@ const validate = (schema, source = 'body') => {
       next();
     } catch (error) {
       if (error.name === 'ZodError') {
-        const errors = error.errors.map((e) => ({
+        const errors = (error.issues || []).map((e) => ({
           field: e.path.slice(hasSourceWrapper ? 1 : 0).join('.') || e.path[0],
           message: e.message,
         }));

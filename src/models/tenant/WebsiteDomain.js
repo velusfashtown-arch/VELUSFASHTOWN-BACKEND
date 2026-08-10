@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Website Domain Schema ───────────────────────────────────────────
 const WebsiteDomainSchema = new mongoose.Schema(
@@ -33,4 +34,4 @@ const WebsiteDomainSchema = new mongoose.Schema(
 WebsiteDomainSchema.index({ website: 1, isPrimary: 1 });
 // Note: domain already has `unique: true` (auto-index).
 
-module.exports = mongoose.model('WebsiteDomain', WebsiteDomainSchema);
+module.exports = websiteConnection.model('WebsiteDomain', WebsiteDomainSchema);

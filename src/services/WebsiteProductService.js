@@ -257,12 +257,15 @@ class WebsiteProductService {
    * Get the full assignment + product detail for a website.
    */
   async getAssignment(websiteId, productId) {
+    // `product` lives in the admin database (a separate mongoose connection
+    // from WebsiteProduct/Website), so it can't be `.populate()`d directly
+    // — fetched manually and attached instead.
     const assignment = await WebsiteProductRepository.model
       .findOne({ website: websiteId, product: productId })
-      .populate('product')
       .populate('website')
       .lean();
     if (!assignment) throw AppError.notFound('Product not assigned to this website');
+    assignment.product = await ProductRepository.model.findById(assignment.product).lean();
     return assignment;
   }
 

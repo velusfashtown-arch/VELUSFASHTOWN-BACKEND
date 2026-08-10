@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { adminConnection } = require('../../config/connections');
 
 // ─── Daily Visit Schema ─────────────────────────────────────────────────
 const DailyVisitSchema = new mongoose.Schema(
@@ -44,7 +45,7 @@ OrderStatsSchema.index({ period: 1, periodKey: 1 }, { unique: true });
 
 // ─── Export Models ──────────────────────────────────────────────────────
 module.exports = {
-  DailyVisit: mongoose.model('DailyVisit', DailyVisitSchema),
-  OrderStats: mongoose.model('OrderStats', OrderStatsSchema)
+  DailyVisit: adminConnection.model('DailyVisit', DailyVisitSchema),
+  OrderStats: adminConnection.model('OrderStats', OrderStatsSchema)
 };
 

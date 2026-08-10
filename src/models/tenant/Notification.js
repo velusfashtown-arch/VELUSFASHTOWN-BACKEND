@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Notification Schema ─────────────────────────────────────────────
 const NotificationSchema = new mongoose.Schema(
@@ -35,4 +36,4 @@ const NotificationSchema = new mongoose.Schema(
 NotificationSchema.index({ readBy: 1, createdAt: -1 });
 NotificationSchema.index({ website: 1, createdAt: -1 });
 
-module.exports = mongoose.model('Notification', NotificationSchema);
+module.exports = websiteConnection.model('Notification', NotificationSchema);

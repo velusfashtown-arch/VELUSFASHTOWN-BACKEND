@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { COUPON_STATUS, COUPON_TYPES } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Coupon Schema ───────────────────────────────────────────────────
 const CouponSchema = new mongoose.Schema(
@@ -48,4 +49,4 @@ const CouponSchema = new mongoose.Schema(
 CouponSchema.index({ status: 1, startDate: 1, endDate: 1 });
 CouponSchema.index({ 'appliesTo.websites': 1 });
 
-module.exports = mongoose.model('Coupon', CouponSchema);
+module.exports = websiteConnection.model('Coupon', CouponSchema);

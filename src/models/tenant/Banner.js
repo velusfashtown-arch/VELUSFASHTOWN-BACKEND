@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Banner Schema ───────────────────────────────────────────────────
 // Website-specific banners with scheduling support.
@@ -29,4 +30,4 @@ const BannerSchema = new mongoose.Schema(
 BannerSchema.index({ website: 1, sortOrder: 1 });
 BannerSchema.index({ website: 1, status: 1 });
 
-module.exports = mongoose.model('Banner', BannerSchema);
+module.exports = websiteConnection.model('Banner', BannerSchema);

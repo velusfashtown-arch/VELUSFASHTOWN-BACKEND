@@ -18,7 +18,7 @@ const generateAccessToken = (payload) => {
   return jwt.sign(payload, getSecret(), { expiresIn: TOKEN_EXPIRY.ACCESS });
 };
 
-const generateRefreshToken = (payload) => {
+const generateToken = (payload) => {
   return jwt.sign(payload, getRefreshSecret(), { expiresIn: TOKEN_EXPIRY.REFRESH });
 };
 
@@ -26,7 +26,7 @@ const verifyAccessToken = (token) => {
   return jwt.verify(token, getSecret());
 };
 
-const verifyRefreshToken = (token) => {
+const verifyToken = (token) => {
   return jwt.verify(token, getRefreshSecret());
 };
 
@@ -38,9 +38,9 @@ module.exports = {
   getSecret,
   getRefreshSecret,
   generateAccessToken,
-  generateRefreshToken,
+  generateToken,
   verifyAccessToken,
-  verifyRefreshToken,
+  verifyToken,
   generateResetToken,
 };
 

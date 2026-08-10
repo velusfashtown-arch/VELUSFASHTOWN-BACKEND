@@ -1,7 +1,7 @@
 const logger = require('../utils/logger');
 
 const validateEnv = () => {
-  const required = ['MONGODB_URI', 'JWT_SECRET'];
+  const required = ['MONGODB_ADMIN_URI', 'MONGODB_WEBSITE_URI', 'JWT_SECRET'];
   const missing = [];
 
   required.forEach((key) => {

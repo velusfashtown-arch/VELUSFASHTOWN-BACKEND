@@ -1,4 +1,4 @@
-const Admin = require('.');
+const Admin = require('./auth/auth');
 const Product = require('./Product');
 const Category = require('./Category');
 const Collection = require('./Collection');

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const { WEBSITE_STATUS } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Theme Sub-Schema ─────────────────────────────────────────────────
 const ThemeSchema = new mongoose.Schema(
@@ -167,4 +168,4 @@ WebsiteSchema.methods.softDelete = async function () {
   return this.save();
 };
 
-module.exports = mongoose.model('Website', WebsiteSchema);
+module.exports = websiteConnection.model('Website', WebsiteSchema);

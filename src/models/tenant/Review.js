@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { REVIEW_STATUS } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Review Schema ───────────────────────────────────────────────────
 const ReviewSchema = new mongoose.Schema(
@@ -47,4 +48,4 @@ ReviewSchema.index({ product: 1, status: 1 });
 ReviewSchema.index({ website: 1, status: 1 });
 ReviewSchema.index({ product: 1, customer: 1 }, { unique: true });
 
-module.exports = mongoose.model('Review', ReviewSchema);
+module.exports = websiteConnection.model('Review', ReviewSchema);

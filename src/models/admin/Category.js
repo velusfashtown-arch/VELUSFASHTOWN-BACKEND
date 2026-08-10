@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const { randomUUID } = require('crypto');
+const { adminConnection } = require('../../config/connections');
 
 function generateCategoryId() {
   return `CAT-${randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase()}`;
@@ -124,5 +125,5 @@ CategorySchema.statics.getCategoryTree = async function () {
 
 CategorySchema.statics.generateCategoryId = generateCategoryId;
 
-module.exports = mongoose.model('Category', CategorySchema);
+module.exports = adminConnection.model('Category', CategorySchema);
 

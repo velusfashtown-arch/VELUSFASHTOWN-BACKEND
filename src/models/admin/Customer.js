@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { adminConnection } = require('../../config/connections');
 
 // ─── Address Sub-Schema ─────────────────────────────────────────────────
 const AddressSchema = new mongoose.Schema(
@@ -148,5 +149,5 @@ CustomerSchema.statics.findByCredentials = async function (email, password) {
   return customer;
 };
 
-module.exports = mongoose.model('Customer', CustomerSchema);
+module.exports = adminConnection.model('Customer', CustomerSchema);
 

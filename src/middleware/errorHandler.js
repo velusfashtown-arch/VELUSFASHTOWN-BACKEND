@@ -54,8 +54,8 @@ const errorHandler = (err, req, res, _next) => {
   }
 
   // ─── Zod Validation Error ──────────────────────────────────────────
-  if (err.name === 'ZodError' || (err.errors && err.errors[0]?.code === 'invalid_type')) {
-    const errors = (err.errors || []).map((e) => ({
+  if (err.name === 'ZodError' || (err.issues && err.issues[0]?.code === 'invalid_type')) {
+    const errors = (err.issues || []).map((e) => ({
       field: e.path?.join('.') || e.path,
       message: e.message,
     }));

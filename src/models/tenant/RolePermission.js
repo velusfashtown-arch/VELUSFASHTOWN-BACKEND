@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Role-Permission Schema ──────────────────────────────────────────
 const RolePermissionSchema = new mongoose.Schema(
@@ -23,4 +24,4 @@ const RolePermissionSchema = new mongoose.Schema(
 
 RolePermissionSchema.index({ role: 1, permission: 1 }, { unique: true });
 
-module.exports = mongoose.model('RolePermission', RolePermissionSchema);
+module.exports = websiteConnection.model('RolePermission', RolePermissionSchema);

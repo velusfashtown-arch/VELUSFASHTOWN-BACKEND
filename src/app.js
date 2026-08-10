@@ -50,7 +50,7 @@ app.use('/api', apiLimiter);
 // ─── API Documentation (Swagger) ─────────────────────────────────────────
 const swaggerUiOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
-customSiteTitle: "VELU'S FASHTOWN API Docs",
+  customSiteTitle: "VELU'S FASHTOWN API Docs",
 };
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
@@ -59,7 +59,7 @@ app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
 app.get('/health', (req, res) => {
   res.json({
     success: true,
-message: "VELU'S FASHTOWN Backend is running",
+    message: "VELU'S FASHTOWN Backend is running",
     data: {
       environment: appConfig.nodeEnv,
       timestamp: new Date().toISOString(),
@@ -105,7 +105,7 @@ async function startServer() {
   const PORT = appConfig.port;
   server = app.listen(PORT, () => {
     console.log(`\n======================================`);
-console.log(`  🚀 VELU'S FASHTOWN Backend Server`);
+    console.log(`  🚀 VELU'S FASHTOWN Backend Server`);
     console.log(`  Environment: ${appConfig.nodeEnv}`);
     console.log(`  Port: ${PORT}`);
     console.log(`  API: http://localhost:${PORT}/api`);

@@ -1,9 +1,9 @@
 const BaseRepository = require('./BaseRepository');
-const Admin = require('../models/admin/Admin');
+const Auth = require('../models/admin/auth/auth');
 
-class AdminRepository extends BaseRepository {
+class AuthRepository extends BaseRepository {
   constructor() {
-    super(Admin);
+    super(Auth);
   }
 
   /**
@@ -11,13 +11,6 @@ class AdminRepository extends BaseRepository {
    */
   async findByEmailWithPassword(email) {
     return this.model.findOne({ email }).select('+password');
-  }
-
-  /**
-   * Find admin by ID with refresh token.
-   */
-  async findByIdWithRefreshToken(id) {
-    return this.model.findById(id).select('+refreshToken');
   }
 
   /**
@@ -29,13 +22,6 @@ class AdminRepository extends BaseRepository {
   }
 
   /**
-   * Update refresh token.
-   */
-  async updateRefreshToken(adminId, refreshToken) {
-    return this.model.findByIdAndUpdate(adminId, { refreshToken }, { new: true });
-  }
-
-  /**
    * Update last login timestamp.
    */
   async updateLastLogin(adminId) {
@@ -43,5 +29,4 @@ class AdminRepository extends BaseRepository {
   }
 }
 
-module.exports = new AdminRepository();
-
+module.exports = new AuthRepository();

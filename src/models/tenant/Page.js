@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── CMS Page Schema ─────────────────────────────────────────────────
 const PageSchema = new mongoose.Schema(
@@ -27,4 +28,4 @@ const PageSchema = new mongoose.Schema(
 PageSchema.index({ website: 1, slug: 1 }, { unique: true });
 PageSchema.index({ website: 1, status: 1 });
 
-module.exports = mongoose.model('Page', PageSchema);
+module.exports = websiteConnection.model('Page', PageSchema);

@@ -134,34 +134,25 @@ class StorefrontController {
     const websiteId = req.websiteId;
     const { page = 1, limit = 20, category, search, sort } = req.query;
 
-    // Find live assignment product IDs for this website.
-    const liveProducts = await WebsiteProductRepository.model.aggregate([
-      {
-        $match: {
-          website: websiteId,
-          approvalStatus: APPROVAL_STATUS.APPROVED,
-          published: true,
-          isActive: true,
-        },
-      },
-      { $lookup: { from: 'products', localField: 'product', foreignField: '_id', as: 'productDoc' } },
-      { $match: { 'productDoc.isDeleted': false } },
-      {
-        $project: {
-          product: 1,
-          websiteTitle: 1,
-          websitePrice: 1,
-          websiteComparePrice: 1,
-          featured: 1,
-        },
-      },
-    ]);
+    // Find live assignments for this website. `product` lives in the admin
+    // database (separate mongoose connection from WebsiteProduct), so it
+    // can't be joined with $lookup/populate — the soft-delete filter is
+    // reapplied below when the actual Product docs are fetched instead.
+    const liveAssignments = await WebsiteProductRepository.model
+      .find({
+        website: websiteId,
+        approvalStatus: APPROVAL_STATUS.APPROVED,
+        published: true,
+        isActive: true,
+      })
+      .select('product websiteTitle websitePrice websiteComparePrice featured')
+      .lean();
 
     const assignmentMap = {};
-    liveProducts.forEach((a) => {
+    liveAssignments.forEach((a) => {
       assignmentMap[String(a.product)] = a;
     });
-    const productIds = liveProducts.map((a) => a.product);
+    const productIds = liveAssignments.map((a) => a.product);
 
     if (productIds.length === 0) {
       return ApiResponse.paginated(res, { data: [], total: 0, page, limit });

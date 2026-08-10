@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Permission Schema ───────────────────────────────────────────────
 const PermissionSchema = new mongoose.Schema(
@@ -15,4 +16,4 @@ const PermissionSchema = new mongoose.Schema(
 
 PermissionSchema.index({ module: 1, action: 1 });
 
-module.exports = mongoose.model('Permission', PermissionSchema);
+module.exports = websiteConnection.model('Permission', PermissionSchema);

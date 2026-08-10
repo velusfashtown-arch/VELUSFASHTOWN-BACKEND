@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const { adminConnection } = require('../../config/connections');
 
 const CollectionSchema = new mongoose.Schema(
   {
@@ -71,5 +72,5 @@ CollectionSchema.pre('save', function (next) {
   next();
 });
 
-module.exports = mongoose.model('Collection', CollectionSchema);
+module.exports = adminConnection.model('Collection', CollectionSchema);
 

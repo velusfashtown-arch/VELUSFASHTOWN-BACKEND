@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { APPROVAL_STATUS } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Website Product Schema ──────────────────────────────────────────
 // The core multi-site join: a central Product assigned to a Website with
@@ -89,4 +90,4 @@ WebsiteProductSchema.virtual('isLive').get(function () {
   );
 });
 
-module.exports = mongoose.model('WebsiteProduct', WebsiteProductSchema);
+module.exports = websiteConnection.model('WebsiteProduct', WebsiteProductSchema);

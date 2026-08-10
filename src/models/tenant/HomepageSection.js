@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { HOMEPAGE_SECTION_TYPES } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Homepage Section Schema ─────────────────────────────────────────
 // Database-driven homepage builder. Each section has a type, settings
@@ -30,4 +31,4 @@ const HomepageSectionSchema = new mongoose.Schema(
 
 HomepageSectionSchema.index({ website: 1, sortOrder: 1 });
 
-module.exports = mongoose.model('HomepageSection', HomepageSectionSchema);
+module.exports = websiteConnection.model('HomepageSection', HomepageSectionSchema);

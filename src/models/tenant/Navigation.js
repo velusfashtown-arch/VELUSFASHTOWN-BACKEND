@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Navigation Schema ───────────────────────────────────────────────
 // A named navigation menu (header / footer / mega) for a website.
@@ -25,4 +26,4 @@ const NavigationSchema = new mongoose.Schema(
 
 NavigationSchema.index({ website: 1, location: 1 });
 
-module.exports = mongoose.model('Navigation', NavigationSchema);
+module.exports = websiteConnection.model('Navigation', NavigationSchema);

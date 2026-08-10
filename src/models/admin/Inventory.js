@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { adminConnection } = require('../../config/connections');
 
 // ─── Stock History Schema ───────────────────────────────────────────────
 const InventorySchema = new mongoose.Schema(
@@ -100,7 +101,7 @@ LowStockAlertSchema.index({ product: 1, isResolved: 1 });
 LowStockAlertSchema.index({ isResolved: 1, createdAt: -1 });
 
 module.exports = {
-  Inventory: mongoose.model('Inventory', InventorySchema),
-  LowStockAlert: mongoose.model('LowStockAlert', LowStockAlertSchema),
+  Inventory: adminConnection.model('Inventory', InventorySchema),
+  LowStockAlert: adminConnection.model('LowStockAlert', LowStockAlertSchema),
 };
 

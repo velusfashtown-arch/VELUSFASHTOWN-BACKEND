@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { NAVIGATION_TYPES } = require('../../constants');
+const { websiteConnection } = require('../../config/connections');
 
 // ─── Navigation Item Schema ──────────────────────────────────────────
 // A single menu entry, optionally nested under a parent (mega menu).
@@ -42,4 +43,4 @@ const NavigationItemSchema = new mongoose.Schema(
 NavigationItemSchema.index({ navigation: 1, sortOrder: 1 });
 NavigationItemSchema.index({ website: 1, parent: 1 });
 
-module.exports = mongoose.model('NavigationItem', NavigationItemSchema);
+module.exports = websiteConnection.model('NavigationItem', NavigationItemSchema);

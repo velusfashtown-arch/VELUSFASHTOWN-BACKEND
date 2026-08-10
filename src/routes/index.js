@@ -17,7 +17,7 @@ const storefrontRoutes = require('./storefront/index.routes');
 router.use('/storefront', storefrontRoutes);
 
 // ─── Admin Routes (Private) ───────────────────────────────────────────
-const adminAuthRoutes = require('./admin/auth.routes');
+const adminAuthRoutes = require('./admin/auth/auth.routes');
 const adminProductRoutes = require('./admin/product.routes');
 const adminCategoryRoutes = require('./admin/category.routes');
 const adminCollectionRoutes = require('./admin/collection.routes');

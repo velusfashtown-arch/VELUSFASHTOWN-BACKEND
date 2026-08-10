@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { ROLES } = require('../../constants');
+const { ROLES } = require('../../../constants');
+const { adminConnection } = require('../../../config/connections');
 
-const AdminSchema = new mongoose.Schema(
+const AuthSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -29,7 +30,7 @@ const AdminSchema = new mongoose.Schema(
       enum: Object.values(ROLES),
       default: ROLES.SUPPORT_MANAGER,
     },
-    refreshToken: {
+    token: {
       type: String,
       select: false,
     },
@@ -42,21 +43,13 @@ const AdminSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
-    phone: {
-      type: String,
-      default: '',
-    },
-    avatar: {
-      type: String,
-      default: '',
-    },
   },
   {
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
         delete ret.password;
-        delete ret.refreshToken;
+        delete ret.token;
         delete ret.resetPasswordToken;
         delete ret.resetPasswordExpires;
         ret.id = ret._id;
@@ -67,10 +60,10 @@ const AdminSchema = new mongoose.Schema(
 );
 
 // Indexes
-AdminSchema.index({ role: 1 });
+AuthSchema.index({ role: 1 });
 
 // Pre-save hook to hash password
-AdminSchema.pre('save', async function (next) {
+AuthSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
@@ -78,18 +71,18 @@ AdminSchema.pre('save', async function (next) {
 });
 
 // Instance method: compare password
-AdminSchema.methods.comparePassword = async function (candidatePassword) {
+AuthSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 // Static method: find by credentials
-AdminSchema.statics.findByCredentials = async function (email, password) {
-  const admin = await this.findOne({ email, isActive: true }).select('+password');
-  if (!admin) return null;
-  const isMatch = await admin.comparePassword(password);
+AuthSchema.statics.findByCredentials = async function (email, password) {
+  const auth = await this.findOne({ email, isActive: true }).select('+password');
+  if (!auth) return null;
+  const isMatch = await auth.comparePassword(password);
   if (!isMatch) return null;
-  return admin;
+  return auth;
 };
 
-module.exports = mongoose.model('Admin', AdminSchema);
+module.exports = adminConnection.model('Admin', AuthSchema, 'auth');
 
