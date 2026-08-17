@@ -35,8 +35,8 @@ const createProductSchema = z.object({
     costPrice: z.number().min(0).optional().default(0),
     discount: z.number().min(0).max(100).optional().default(0),
     gst: z.number().min(0).max(100).optional().default(0),
-    category: z.string().optional().nullable(),
-    subCategory: z.string().optional().nullable(),
+    category: z.string().min(1, 'Category is required'),
+    subCategory: z.string().min(1, 'Sub category is required'),
     productType: z.string().optional().default(''),
     occasion: z.array(z.string()).optional().default([]),
     stock: z.number().min(0).optional().default(0),
@@ -45,6 +45,9 @@ const createProductSchema = z.object({
     tags: z.array(z.string()).optional().default([]),
     hasVariants: z.boolean().optional().default(false),
     variants: z.array(variantSchema).optional().default([]),
+    // Custom fields (see the Master model) — value type depends on
+    // the field's fieldType, so it's left loosely typed here.
+    customFields: z.array(z.object({ key: z.string(), value: z.any() })).optional().default([]),
     // Saree specific fields
     sareeFabric: z.string().optional().default(''),
     blouseFabric: z.string().optional().default(''),
@@ -114,6 +117,7 @@ const updateProductSchema = z.object({
     tags: z.array(z.string()).optional(),
     hasVariants: z.boolean().optional(),
     variants: z.array(variantSchema).optional(),
+    customFields: z.array(z.object({ key: z.string(), value: z.any() })).optional(),
     // Saree specific fields
     sareeFabric: z.string().optional(),
     blouseFabric: z.string().optional(),

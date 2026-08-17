@@ -7,7 +7,7 @@ class WebsiteProductController {
    * GET /api/admin/websites/:websiteId/products
    */
   listForWebsite = asyncHandler(async (req, res) => {
-    const result = await WebsiteProductService.listForWebsite(req.params.websiteId, req.query);
+    const result = await WebsiteProductService.listForWebsite(req.params.id, req.query);
     return ApiResponse.paginated(res, {
       data: result.data,
       total: result.pagination.total,
@@ -21,7 +21,7 @@ class WebsiteProductController {
    */
   getAssignment = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.getAssignment(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId
     );
     return ApiResponse.success(res, { data: assignment });
@@ -32,7 +32,7 @@ class WebsiteProductController {
    */
   getHistory = asyncHandler(async (req, res) => {
     const history = await WebsiteProductService.getHistory(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId
     );
     return ApiResponse.success(res, { data: history });
@@ -44,7 +44,7 @@ class WebsiteProductController {
    */
   assign = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.assignProduct(
-      req.params.websiteId,
+      req.params.id,
       req.body.productId,
       req.body,
       req.adminId
@@ -60,7 +60,7 @@ class WebsiteProductController {
    */
   update = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.updateAssignment(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.body,
       req.adminId
@@ -73,7 +73,7 @@ class WebsiteProductController {
    */
   unassign = asyncHandler(async (req, res) => {
     const result = await WebsiteProductService.unassignProduct(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.adminId
     );
@@ -85,7 +85,7 @@ class WebsiteProductController {
    */
   approve = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.approve(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.adminId
     );
@@ -98,7 +98,7 @@ class WebsiteProductController {
    */
   reject = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.reject(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.body?.reason,
       req.adminId
@@ -111,7 +111,7 @@ class WebsiteProductController {
    */
   publish = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.publish(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.adminId
     );
@@ -123,7 +123,7 @@ class WebsiteProductController {
    */
   unpublish = asyncHandler(async (req, res) => {
     const assignment = await WebsiteProductService.unpublish(
-      req.params.websiteId,
+      req.params.id,
       req.params.productId,
       req.adminId
     );
@@ -136,7 +136,7 @@ class WebsiteProductController {
    */
   bulkAssign = asyncHandler(async (req, res) => {
     const result = await WebsiteProductService.bulkAssign(
-      req.params.websiteId,
+      req.params.id,
       req.body.productIds,
       req.adminId
     );
@@ -148,7 +148,7 @@ class WebsiteProductController {
    */
   bulkApprove = asyncHandler(async (req, res) => {
     const result = await WebsiteProductService.bulkApprove(
-      req.params.websiteId,
+      req.params.id,
       req.body.productIds,
       req.adminId
     );
@@ -160,7 +160,7 @@ class WebsiteProductController {
    */
   bulkPublish = asyncHandler(async (req, res) => {
     const result = await WebsiteProductService.bulkPublish(
-      req.params.websiteId,
+      req.params.id,
       req.body.productIds,
       req.adminId
     );

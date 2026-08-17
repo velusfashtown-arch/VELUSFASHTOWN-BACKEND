@@ -87,7 +87,7 @@ const ProductSchema = new mongoose.Schema(
 
     // ─── Categorization ───────────────────────────────────────────────
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
-    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
+    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory', default: null },
     collection: { type: mongoose.Schema.Types.ObjectId, ref: 'Collection', default: null },
     productType: { type: String, default: '' },
 
@@ -151,6 +151,15 @@ const ProductSchema = new mongoose.Schema(
     // ─── Variants ─────────────────────────────────────────────────────
     hasVariants: { type: Boolean, default: false },
     variants: [VariantSchema],
+
+    // ─── Custom Fields ────────────────────────────────────────────────
+    // Admin-defined extra fields (see the Master model) — kept as a
+    // flexible key/value list instead of fixed schema columns, so adding
+    // a new field from the admin never needs a schema migration.
+    customFields: {
+      type: [{ key: String, value: mongoose.Schema.Types.Mixed, _id: false }],
+      default: [],
+    },
 
     // ─── Tags ─────────────────────────────────────────────────────────
     tags: [{ type: String, lowercase: true, trim: true }],

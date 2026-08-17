@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { resolveWebsite } = require('../../middleware/resolveWebsite');
+const { validate } = require('../../middleware/validate');
 const { StorefrontController } = require('../../controllers/storefront/StorefrontController');
+const { submitFormSchema } = require('../../validators/form.validator');
 
 // Resolve the website for every storefront request.
 router.use(resolveWebsite);
@@ -69,5 +71,18 @@ router.get('/pages/:slug', StorefrontController.page);
  *     tags: [Storefront]
  */
 router.get('/search', StorefrontController.search);
+
+/**
+ * @swagger
+ * /api/storefront/:websiteSlug/forms/:slug:
+ *   get:
+ *     summary: Get a customer-facing form's field definitions
+ *     tags: [Storefront]
+ *   post:
+ *     summary: Submit a customer-facing form (path suffix /submit)
+ *     tags: [Storefront]
+ */
+router.get('/forms/:slug', StorefrontController.getForm);
+router.post('/forms/:slug/submit', validate(submitFormSchema), StorefrontController.submitForm);
 
 module.exports = router;

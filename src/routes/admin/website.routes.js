@@ -3,6 +3,8 @@ const router = express.Router();
 const WebsiteController = require('../../controllers/admin/WebsiteController');
 const WebsiteProductController = require('../../controllers/admin/WebsiteProductController');
 const WebsiteContentController = require('../../controllers/admin/WebsiteContentController');
+const FormsBuilderController = require('../../controllers/admin/forms/FormsBuilderController');
+const FormSubmissionController = require('../../controllers/admin/FormSubmissionController');
 const { authenticate, authorize } = require('../../middleware');
 const { validate: validateDirect } = require('../../middleware/validate');
 const { ROLES } = require('../../constants');
@@ -21,6 +23,11 @@ const {
   createBannerSchema,
   updateBannerSchema,
 } = require('../../validators/website.validator');
+const {
+  createFormSchema,
+  updateFormSchema,
+  updateSubmissionStatusSchema,
+} = require('../../validators/form.validator');
 
 // All routes require authentication
 router.use(authenticate);
@@ -80,5 +87,20 @@ router.get('/:id/banners', authorize(...contentAllowed), WebsiteContentControlle
 router.post('/:id/banners', authorize(...contentAllowed), validateDirect(createBannerSchema), WebsiteContentController.createBanner);
 router.put('/:id/banners/:bannerId', authorize(...contentAllowed), validateDirect(updateBannerSchema), WebsiteContentController.updateBanner);
 router.delete('/:id/banners/:bannerId', authorize(...contentAllowed), WebsiteContentController.deleteBanner);
+
+// ─── Forms (customer-facing) ───────────────────────────────────────────
+router.get('/forms/types', authorize(...contentAllowed), FormsBuilderController.listTypes);
+router.get('/:id/forms', authorize(...contentAllowed), FormsBuilderController.list);
+router.post('/:id/forms', authorize(...contentAllowed), validateDirect(createFormSchema), FormsBuilderController.create);
+router.get('/:id/forms/:formId', authorize(...contentAllowed), FormsBuilderController.getById);
+router.put('/:id/forms/:formId', authorize(...contentAllowed), validateDirect(updateFormSchema), FormsBuilderController.update);
+router.delete('/:id/forms/:formId', authorize(...contentAllowed), FormsBuilderController.delete);
+
+// ─── Form Submissions ───────────────────────────────────────────────────
+router.get('/:id/forms/:formId/submissions', authorize(...contentAllowed), FormSubmissionController.list);
+router.get('/:id/submissions', authorize(...contentAllowed), FormSubmissionController.list);
+router.get('/:id/submissions/:submissionId', authorize(...contentAllowed), FormSubmissionController.getById);
+router.put('/:id/submissions/:submissionId', authorize(...contentAllowed), validateDirect(updateSubmissionStatusSchema), FormSubmissionController.updateStatus);
+router.delete('/:id/submissions/:submissionId', authorize(...contentAllowed), FormSubmissionController.delete);
 
 module.exports = router;

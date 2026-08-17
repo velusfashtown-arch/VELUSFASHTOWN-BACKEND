@@ -6,11 +6,14 @@ const Navigation = require('../../models/tenant/Navigation');
 const NavigationItem = require('../../models/tenant/NavigationItem');
 const Banner = require('../../models/tenant/Banner');
 const Page = require('../../models/tenant/Page');
-const CategoryRepository = require('../../repositories/CategoryRepository');
+const CategoryRepository = require('../../repositories/admin/products/Categories/Category/CategoryRepository');
 const CollectionRepository = require('../../repositories/CollectionRepository');
 const Product = require('../../models/admin/Product');
+const FormRepository = require('../../repositories/FormRepository');
+const FormSubmissionService = require('../../services/FormSubmissionService');
 const asyncHandler = require('../../utils/asyncHandler');
 const ApiResponse = require('../../utils/response');
+const AppError = require('../../utils/AppError');
 const { APPROVAL_STATUS } = require('../../constants');
 
 /**
@@ -77,7 +80,7 @@ function serializeForStorefront(product, assignment = {}) {
     image: images[0] || '',
     mainImage: product.mainImage || images[0] || '',
     categoryName: category,
-    categorySlug: (product.category && typeof product.category === 'object' && product.category.slug) || '',
+    categoryId: (product.category && typeof product.category === 'object' && product.category.categoryId) || '',
     stock: Number(product.stock || 0),
     isFeatured: Boolean(assignment.featured ?? product.isFeatured),
     averageRating: Number(product.averageRating || 0),
@@ -160,8 +163,8 @@ class StorefrontController {
 
     const filter = { _id: { $in: productIds }, isDeleted: false, isActive: true };
     if (category) {
-      // Match by category id or slug
-      const cat = await CategoryRepository.findOne({ $or: [{ slug: category }, { _id: category }] });
+      // Match by the public category id or Mongo id.
+      const cat = await CategoryRepository.findOne({ $or: [{ categoryId: category }, { _id: category }] });
       if (cat) filter.$or = [{ category: cat.id || cat._id }, { subCategory: cat.id || cat._id }];
     }
     if (search) {
@@ -326,6 +329,37 @@ const { slug } = req.params;
 
 const data = docs.map((p) => serializeForStorefront(p, assignmentMap[String(p._id)] || {}));
     return ApiResponse.paginated(res, { data, total, page: Number(page), limit: Number(limit) });
+  });
+
+  /**
+   * GET /api/storefront/:websiteSlug/forms/:slug
+   * Public form definition — active forms only.
+   */
+  getForm = asyncHandler(async (req, res) => {
+    const form = await FormRepository.findBySlug(req.websiteId, req.params.slug);
+    if (!form || !form.isActive) throw AppError.notFound('Form not found');
+    return ApiResponse.success(res, {
+      data: {
+        name: form.name,
+        slug: form.slug,
+        title: form.title,
+        description: form.description,
+        fields: form.fields,
+        submitButtonText: form.submitButtonText,
+      },
+    });
+  });
+
+  /**
+   * POST /api/storefront/:websiteSlug/forms/:slug/submit
+   * Public form submission.
+   */
+  submitForm = asyncHandler(async (req, res) => {
+    const result = await FormSubmissionService.submit(req.websiteId, req.params.slug, req.body, {
+      ip: req.ip,
+      userAgent: req.get('user-agent') || '',
+    });
+    return ApiResponse.created(res, { data: { submissionId: result.submissionId }, message: result.message });
   });
 }
 

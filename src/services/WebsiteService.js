@@ -29,8 +29,12 @@ class WebsiteService {
   /**
    * Get a single website by id or slug.
    */
-  async getWebsite(idOrSlug) {
-    const website = await WebsiteRepository.resolve(idOrSlug);
+  // Used only by the admin "get one website" route, where req.params.id is
+  // always the Mongo _id (the admin frontend links to /admin/websites/:id
+  // using the id it got back from the list endpoint) — resolve() is for
+  // the storefront, which looks websites up by slug/domain instead.
+  async getWebsite(id) {
+    const website = await WebsiteRepository.findById(id);
     if (!website) throw AppError.notFound('Website not found');
     return website;
   }

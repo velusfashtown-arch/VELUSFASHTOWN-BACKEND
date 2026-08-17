@@ -10,18 +10,18 @@ const ApiResponse = require('../../utils/response');
 class WebsiteContentController {
   // ─── Homepage Sections ─────────────────────────────────────────────
   listHomepageSections = asyncHandler(async (req, res) => {
-    const sections = await WebsiteContentService.listHomepageSections(req.params.websiteId);
+    const sections = await WebsiteContentService.listHomepageSections(req.params.id);
     return ApiResponse.success(res, { data: sections });
   });
 
   createHomepageSection = asyncHandler(async (req, res) => {
-    const section = await WebsiteContentService.createHomepageSection(req.params.websiteId, req.body);
+    const section = await WebsiteContentService.createHomepageSection(req.params.id, req.body);
     return ApiResponse.created(res, { data: section, message: 'Homepage section created' });
   });
 
   updateHomepageSection = asyncHandler(async (req, res) => {
     const section = await WebsiteContentService.updateHomepageSection(
-      req.params.websiteId,
+      req.params.id,
       req.params.sectionId,
       req.body
     );
@@ -29,34 +29,34 @@ class WebsiteContentController {
   });
 
   deleteHomepageSection = asyncHandler(async (req, res) => {
-    const result = await WebsiteContentService.deleteHomepageSection(req.params.websiteId, req.params.sectionId);
+    const result = await WebsiteContentService.deleteHomepageSection(req.params.id, req.params.sectionId);
     return ApiResponse.success(res, { data: result, message: 'Homepage section deleted' });
   });
 
   duplicateHomepageSection = asyncHandler(async (req, res) => {
-    const section = await WebsiteContentService.duplicateHomepageSection(req.params.websiteId, req.params.sectionId);
+    const section = await WebsiteContentService.duplicateHomepageSection(req.params.id, req.params.sectionId);
     return ApiResponse.created(res, { data: section, message: 'Homepage section duplicated' });
   });
 
   reorderHomepageSections = asyncHandler(async (req, res) => {
-    const sections = await WebsiteContentService.reorderHomepageSections(req.params.websiteId, req.body.orderedIds);
+    const sections = await WebsiteContentService.reorderHomepageSections(req.params.id, req.body.orderedIds);
     return ApiResponse.success(res, { data: sections, message: 'Homepage sections reordered' });
   });
 
   // ─── Navigation ────────────────────────────────────────────────────
   listNavigations = asyncHandler(async (req, res) => {
-    const data = await WebsiteContentService.listNavigations(req.params.websiteId);
+    const data = await WebsiteContentService.listNavigations(req.params.id);
     return ApiResponse.success(res, { data });
   });
 
   createNavigationItem = asyncHandler(async (req, res) => {
-    const item = await WebsiteContentService.createNavigationItem(req.params.websiteId, req.body);
+    const item = await WebsiteContentService.createNavigationItem(req.params.id, req.body);
     return ApiResponse.created(res, { data: item, message: 'Navigation item created' });
   });
 
   updateNavigationItem = asyncHandler(async (req, res) => {
     const item = await WebsiteContentService.updateNavigationItem(
-      req.params.websiteId,
+      req.params.id,
       req.params.itemId,
       req.body
     );
@@ -64,33 +64,33 @@ class WebsiteContentController {
   });
 
   deleteNavigationItem = asyncHandler(async (req, res) => {
-    const result = await WebsiteContentService.deleteNavigationItem(req.params.websiteId, req.params.itemId);
+    const result = await WebsiteContentService.deleteNavigationItem(req.params.id, req.params.itemId);
     return ApiResponse.success(res, { data: result, message: 'Navigation item deleted' });
   });
 
   reorderNavigationItems = asyncHandler(async (req, res) => {
-    const items = await WebsiteContentService.reorderNavigationItems(req.params.websiteId, req.body.orderedIds);
+    const items = await WebsiteContentService.reorderNavigationItems(req.params.id, req.body.orderedIds);
     return ApiResponse.success(res, { data: items, message: 'Navigation items reordered' });
   });
 
   // ─── Banners ───────────────────────────────────────────────────────
   listBanners = asyncHandler(async (req, res) => {
-    const banners = await WebsiteContentService.listBanners(req.params.websiteId);
+    const banners = await WebsiteContentService.listBanners(req.params.id);
     return ApiResponse.success(res, { data: banners });
   });
 
   createBanner = asyncHandler(async (req, res) => {
-    const banner = await WebsiteContentService.createBanner(req.params.websiteId, req.body);
+    const banner = await WebsiteContentService.createBanner(req.params.id, req.body);
     return ApiResponse.created(res, { data: banner, message: 'Banner created' });
   });
 
   updateBanner = asyncHandler(async (req, res) => {
-    const banner = await WebsiteContentService.updateBanner(req.params.websiteId, req.params.bannerId, req.body);
+    const banner = await WebsiteContentService.updateBanner(req.params.id, req.params.bannerId, req.body);
     return ApiResponse.success(res, { data: banner, message: 'Banner updated' });
   });
 
   deleteBanner = asyncHandler(async (req, res) => {
-    const result = await WebsiteContentService.deleteBanner(req.params.websiteId, req.params.bannerId);
+    const result = await WebsiteContentService.deleteBanner(req.params.id, req.params.bannerId);
     return ApiResponse.success(res, { data: result, message: 'Banner deleted' });
   });
 }

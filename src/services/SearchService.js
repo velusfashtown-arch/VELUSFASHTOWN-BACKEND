@@ -1,5 +1,5 @@
 const ProductRepository = require('../repositories/ProductRepository');
-const CategoryRepository = require('../repositories/CategoryRepository');
+const CategoryRepository = require('../repositories/admin/products/Categories/Category/CategoryRepository');
 
 class SearchService {
   /**

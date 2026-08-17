@@ -1,5 +1,6 @@
 const ProductRepository = require('../repositories/ProductRepository');
-const CategoryRepository = require('../repositories/CategoryRepository');
+const CategoryRepository = require('../repositories/admin/products/Categories/Category/CategoryRepository');
+const SubCategoryRepository = require('../repositories/admin/products/Categories/SubCategory/SubCategoryRepository');
 const { generateSlug, generateSKU } = require('../utils/helpers');
 const { generateProductId } = require('../utils/idGenerator');
 const AppError = require('../utils/AppError');
@@ -7,10 +8,10 @@ const logger = require('../utils/logger');
 const { PRODUCT_STATUS } = require('../constants');
 
 /**
- * The admin category dropdowns hand back a category's human-readable
+ * The admin category dropdown hands back a category's human-readable
  * categoryId (e.g. "CAT-585D4F79FE82"), not its Mongo _id, but
- * Product.category/subCategory are ObjectId refs — resolve either form
- * to the real _id before persisting, or Mongoose throws a CastError.
+ * Product.category is an ObjectId ref — resolve either form to the real
+ * _id before persisting, or Mongoose throws a CastError.
  */
 async function resolveCategoryRef(value) {
   if (!value) return value;
@@ -20,6 +21,18 @@ async function resolveCategoryRef(value) {
     throw AppError.badRequest(`Category "${value}" not found`);
   }
   return category.id || category._id;
+}
+
+// Same as resolveCategoryRef, but against the separate SubCategory
+// collection (public id prefix "SUBCAT-").
+async function resolveSubCategoryRef(value) {
+  if (!value) return value;
+  if (/^[a-f\d]{24}$/i.test(value)) return value;
+  const subCategory = await SubCategoryRepository.findOne({ subCategoryId: value });
+  if (!subCategory) {
+    throw AppError.badRequest(`Sub category "${value}" not found`);
+  }
+  return subCategory.id || subCategory._id;
 }
 
 class ProductService {
@@ -129,7 +142,7 @@ class ProductService {
     data.slug = generateSlug(data.name);
 
     if (data.category !== undefined) data.category = await resolveCategoryRef(data.category);
-    if (data.subCategory !== undefined) data.subCategory = await resolveCategoryRef(data.subCategory);
+    if (data.subCategory !== undefined) data.subCategory = await resolveSubCategoryRef(data.subCategory);
 
     // Set default selling price if not provided
     if (!data.sellingPrice && data.mrp) {
@@ -162,7 +175,7 @@ class ProductService {
     }
 
     if (data.category !== undefined) data.category = await resolveCategoryRef(data.category);
-    if (data.subCategory !== undefined) data.subCategory = await resolveCategoryRef(data.subCategory);
+    if (data.subCategory !== undefined) data.subCategory = await resolveSubCategoryRef(data.subCategory);
 
     // Recalculate profit margin if prices changed
     const finalSellingPrice = data.sellingPrice ?? existing.sellingPrice;
@@ -448,9 +461,9 @@ function refName(ref) {
   return typeof ref === 'object' ? (ref.name || '') : '';
 }
 
-function refSlug(ref) {
+function refCategoryId(ref) {
   if (!ref) return '';
-  return typeof ref === 'object' ? (ref.slug || '') : '';
+  return typeof ref === 'object' ? (ref.categoryId || '') : '';
 }
 
 function serializeProductForWebsite(product) {
@@ -526,12 +539,11 @@ function serializeProductForWebsite(product) {
 
     // Category / sub-category / collection
     categoryName: category,
-    categorySlug: refSlug(product.category),
+    categoryId: refCategoryId(product.category),
     category,
     subCategoryName: refName(product.subCategory),
-    subCategorySlug: refSlug(product.subCategory),
     collectionName: refName(product.collection),
-    collectionSlug: refSlug(product.collection),
+    collectionSlug: typeof product.collection === 'object' ? (product.collection.slug || '') : '',
 
     // Commerce fields
     stock: Number(product.stock || 0),
@@ -551,4 +563,3 @@ function serializeProductForWebsite(product) {
 }
 
 module.exports = new ProductService();
-

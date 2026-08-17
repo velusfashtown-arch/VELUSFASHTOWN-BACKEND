@@ -223,6 +223,41 @@ const UPLOAD_LIMITS = Object.freeze({
   THUMBNAIL_HEIGHT: 300,
 });
 
+// Input types a custom product field can render as.
+const CUSTOM_FIELD_TYPES = Object.freeze({
+  TEXT: 'text',
+  TEXTAREA: 'textarea',
+  NUMBER: 'number',
+  DROPDOWN: 'dropdown',
+  CHECKBOX: 'checkbox',
+  RADIO: 'radio',
+  RICHTEXT: 'richtext',
+  IMAGE: 'image',
+});
+
+const FORM_SUBMISSION_STATUS = Object.freeze({
+  NEW: 'new',
+  READ: 'read',
+  ARCHIVED: 'archived',
+});
+
+// What a customer-facing form is for — purely a label/category so admins
+// can tell forms apart and filter them; it doesn't change how the form
+// behaves or renders.
+const FORM_TYPES = Object.freeze({
+  CONTACT_US: 'contact_us',
+  PRODUCT_INQUIRY: 'product_inquiry',
+  CATEGORY_REQUEST: 'category_request',
+  GENERAL: 'general',
+});
+
+const FORM_TYPE_LABELS = Object.freeze({
+  [FORM_TYPES.CONTACT_US]: 'Contact Us',
+  [FORM_TYPES.PRODUCT_INQUIRY]: 'Product Inquiry',
+  [FORM_TYPES.CATEGORY_REQUEST]: 'Category Request',
+  [FORM_TYPES.GENERAL]: 'General / Custom',
+});
+
 const GST_RATE = Object.freeze({
   ZERO: 0,
   FIVE: 5,
@@ -250,6 +285,10 @@ module.exports = {
   HOMEPAGE_SECTION_TYPES,
   INVENTORY_TX_TYPES,
   RTO_STATUS,
+  CUSTOM_FIELD_TYPES,
+  FORM_SUBMISSION_STATUS,
+  FORM_TYPES,
+  FORM_TYPE_LABELS,
   COURIER_LIST,
   SORT_OPTIONS,
   PAGINATION,

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AuthController = require('../../../controllers/admin/auth/AuthController');
 const { authenticate, validate, authLimiter } = require('../../../middleware');
-const { loginSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema } = require('../../../validators/admin/auth.validator');
+const { loginSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema } = require('../../../validators/admin/auth/auth.validator');
 
 // Public routes (with rate limiting)
 router.post('/login', authLimiter, validate(loginSchema), AuthController.login);

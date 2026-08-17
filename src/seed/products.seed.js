@@ -1,5 +1,5 @@
 const Product = require('../models/admin/Product');
-const Category = require('../models/admin/Category');
+const Category = require('../models/admin/Products/Categories/Category/Category');
 const logger = require('../utils/logger');
 const { generateSlug } = require('../utils/helpers');
 const { STOCK_STATUS, PRODUCT_STATUS } = require('../constants');
