@@ -1,25 +1,11 @@
-const Product = require('../models/admin/Product');
-const Category = require('../models/admin/Products/Categories/Category/Category');
-const logger = require('../utils/logger');
-const { generateSlug } = require('../utils/helpers');
-const { STOCK_STATUS, PRODUCT_STATUS } = require('../constants');
+const Product = require('../../../../models/admin/Products/Product/Product');
+const Category = require('../../../../models/admin/Products/Categories/Category/Category');
+const logger = require('../../../../utils/logger');
+const { STOCK_STATUS, PRODUCT_STATUS } = require('../../../../constants');
 
 async function seedProducts() {
   const forceReset = String(process.env.ADMIN_FORCE_RESET || '').toLowerCase() === 'true';
   const existingCount = await Product.countDocuments({});
-
-  // Backfill slugs on any existing products that were created before slug
-  // generation was added (they have slug: null, which violates the unique
-  // index once more than one such row exists). This is safe and idempotent.
-  const missingSlugDoc = await Product.findOne({ $or: [{ slug: null }, { slug: '' }, { slug: { $exists: false } }] });
-  if (missingSlugDoc) {
-    const missing = await Product.find({ $or: [{ slug: null }, { slug: '' }, { slug: { $exists: false } }] });
-    for (const doc of missing) {
-      doc.slug = generateSlug(doc.name || `product-${doc._id}`);
-      await doc.save();
-    }
-    logger.info(`Backfilled slugs for ${missing.length} existing product(s).`);
-  }
 
   if (existingCount > 0 && !forceReset) {
     logger.info(`Products already seeded (${existingCount}). Skipping.`);
@@ -56,9 +42,6 @@ name: "VELU'S FASHTOWN Banarasi Silk Saree - Zari Border",
       stock: 20,
       lowStockAlert: 5,
       stockStatus: STOCK_STATUS.IN_STOCK,
-      sareeFabric: 'Banarasi Silk',
-      workType: 'Zari Border',
-      primaryColor: 'Maroon',
       occasion: ['Wedding', 'Festival'],
       isFeatured: true,
       isTrending: true,
@@ -81,9 +64,6 @@ name: "VELU'S FASHTOWN Cotton Handloom Saree - Daily Wear",
       stock: 50,
       lowStockAlert: 10,
       stockStatus: STOCK_STATUS.IN_STOCK,
-      sareeFabric: 'Cotton',
-      workType: 'Minimal Work',
-      primaryColor: 'Mustard',
       occasion: ['Casual', 'Daily'],
       isFeatured: false,
       isNewArrival: true,
@@ -105,9 +85,6 @@ name: "VELU'S FASHTOWN Georgette Embroidered Saree - Festive",
       stock: 15,
       lowStockAlert: 5,
       stockStatus: STOCK_STATUS.IN_STOCK,
-      sareeFabric: 'Georgette',
-      workType: 'Embroidered',
-      primaryColor: 'Royal Blue',
       occasion: ['Festival', 'Party'],
       isFeatured: true,
       isTodaysDeal: true,
@@ -129,10 +106,6 @@ name: "VELU'S FASHTOWN Chiffon Saree - Everyday Elegance",
       stock: 35,
       lowStockAlert: 5,
       stockStatus: STOCK_STATUS.IN_STOCK,
-      sareeFabric: 'Chiffon',
-      workType: 'Woven Texture',
-      primaryColor: 'Sea Green',
-      secondaryColor: 'Teal',
       occasion: ['Casual', 'Office'],
       isNewArrival: true,
       status: PRODUCT_STATUS.PUBLISHED,
@@ -141,20 +114,16 @@ name: "VELU'S FASHTOWN Chiffon Saree - Everyday Elegance",
     },
   ];
 
-  // insertMany bypasses the Mongoose pre('save') hook, so generate a unique
-  // slug for each product here (the slug field has a unique index and must
-  // not be null for multiple documents). Also ensure every seeded product
-  // has a customer-facing productId (the storefront uses it as the public
-  // id — e.g. in URLs, cart, wishlist and order placement).
-  const withSlugsAndIds = products.map((product, index) => ({
+  // Ensure every seeded product has a customer-facing productId (the
+  // storefront uses it as the public id — e.g. in URLs, cart, wishlist
+  // and order placement).
+  const withIds = products.map((product, index) => ({
     ...product,
     productId: product.productId || `PRD${String(index + 1).padStart(5, '0')}`,
-    slug: generateSlug(product.name),
   }));
 
-await Product.insertMany(withSlugsAndIds);
+await Product.insertMany(withIds);
   logger.info(`Seeded ${products.length} products`);
 }
 
 module.exports = { seedProducts };
-

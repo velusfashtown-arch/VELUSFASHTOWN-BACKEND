@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const BaseRepository = require('./BaseRepository');
-const Product = require('../models/admin/Product');
-const { generateProductId } = require('../utils/idGenerator');
+const BaseRepository = require('../../../BaseRepository');
+const Product = require('../../../../models/admin/Products/Product/Product');
+const { generateProductId } = require('../../../../utils/idGenerator');
 
 class ProductRepository extends BaseRepository {
   constructor() {
@@ -15,7 +15,6 @@ class ProductRepository extends BaseRepository {
     const {
       search,
       category,
-      collection,
       subCategory,
       minPrice,
       maxPrice,
@@ -27,10 +26,7 @@ class ProductRepository extends BaseRepository {
       isTodaysDeal,
       isFlashSale,
       isNewArrival,
-      fabric,
       occasion,
-      color,
-      pattern,
       tags,
       sort,
       page = 1,
@@ -51,7 +47,6 @@ class ProductRepository extends BaseRepository {
 
     // Filters
     if (category) filter.category = category;
-    if (collection) filter.collection = collection;
     if (subCategory) filter.subCategory = subCategory;
     if (minPrice || maxPrice) {
       filter.sellingPrice = {};
@@ -66,14 +61,12 @@ class ProductRepository extends BaseRepository {
     if (isTodaysDeal === 'true') filter.isTodaysDeal = true;
     if (isFlashSale === 'true') filter.isFlashSale = true;
     if (isNewArrival === 'true') filter.isNewArrival = true;
-    if (fabric) filter.sareeFabric = { $regex: fabric, $options: 'i' };
     if (occasion) filter.occasion = { $in: occasion.split(',') };
-    if (color) filter.primaryColor = { $regex: color, $options: 'i' };
-    if (pattern) filter.pattern = { $regex: pattern, $options: 'i' };
     if (tags) filter.tags = { $in: tags.split(',').map((t) => t.trim().toLowerCase()) };
 
-    // Sort
-    let sortOption = { createdAt: -1 };
+    // Sort — productId is sequential (PRD00001, PRD00002, ...), so it
+    // doubles as a reliable "newest first" ordering without createdAt.
+    let sortOption = { productId: -1 };
     switch (sort) {
       case 'price_asc':
         sortOption = { sellingPrice: 1 };
@@ -82,10 +75,10 @@ class ProductRepository extends BaseRepository {
         sortOption = { sellingPrice: -1 };
         break;
       case 'newest':
-        sortOption = { createdAt: -1 };
+        sortOption = { productId: -1 };
         break;
       case 'oldest':
-        sortOption = { createdAt: 1 };
+        sortOption = { productId: 1 };
         break;
       case 'popularity':
         sortOption = { totalSold: -1 };
@@ -97,14 +90,14 @@ class ProductRepository extends BaseRepository {
         sortOption = { name: -1 };
         break;
       default:
-        sortOption = { createdAt: -1 };
+        sortOption = { productId: -1 };
     }
 
     return this.findAll(filter, {
       sort: sortOption,
       page: Number(page),
       limit: Number(limit),
-      populate: 'category collection',
+      populate: 'category',
     });
   }
 
@@ -129,10 +122,7 @@ class ProductRepository extends BaseRepository {
     const productObj = product.toObject();
     delete productObj._id;
     delete productObj.productId;
-    delete productObj.slug;
     delete productObj.sku;
-    delete productObj.createdAt;
-    delete productObj.updatedAt;
     delete productObj.totalSold;
     delete productObj.averageRating;
     delete productObj.reviewCount;
@@ -141,6 +131,13 @@ class ProductRepository extends BaseRepository {
     productObj.isActive = false;
     productObj.status = 'Draft';
     productObj.productId = await generateProductId();
+    // Each variant needs its own identity, not the original's.
+    if (Array.isArray(productObj.variants)) {
+      productObj.variants = productObj.variants.map((variant) => ({
+        ...variant,
+        variantId: this.model.generateVariantId(),
+      }));
+    }
 
     return this.model.create(productObj);
   }
@@ -229,4 +226,3 @@ class ProductRepository extends BaseRepository {
 }
 
 module.exports = new ProductRepository();
-

@@ -3,6 +3,14 @@ const asyncHandler = require('../../../../utils/asyncHandler');
 const ApiResponse = require('../../../../utils/response');
 
 function cleanMaster(field) {
+  // Do not spread an unpopulated Mongo ObjectId: it serializes its internal
+  // Buffer as `buffer.data`. Only expose the parent-category fields the
+  // client needs to match against a selected category's id.
+  const rawCategory = field.category;
+  const category = rawCategory && typeof rawCategory === 'object' && rawCategory.categoryId
+    ? { id: rawCategory.categoryId, name: rawCategory.name }
+    : null;
+
   return {
     id: field.masterId,
     key: field.key,
@@ -19,6 +27,8 @@ function cleanMaster(field) {
     group: field.group,
     order: field.order,
     isActive: field.isActive,
+    isCore: field.isCore,
+    category,
   };
 }
 

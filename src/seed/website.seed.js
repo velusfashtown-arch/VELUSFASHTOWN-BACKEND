@@ -1,7 +1,7 @@
 const Website = require('../models/tenant/Website');
 const WebsiteDomain = require('../models/tenant/WebsiteDomain');
 const WebsiteProduct = require('../models/tenant/WebsiteProduct');
-const Product = require('../models/admin/Product');
+const Product = require('../models/admin/Products/Product/Product');
 const logger = require('../utils/logger');
 const { APPROVAL_STATUS, PRODUCT_STATUS } = require('../constants');
 

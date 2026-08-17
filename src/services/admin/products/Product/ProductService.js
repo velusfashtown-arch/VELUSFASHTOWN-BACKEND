@@ -1,11 +1,11 @@
-const ProductRepository = require('../repositories/ProductRepository');
-const CategoryRepository = require('../repositories/admin/products/Categories/Category/CategoryRepository');
-const SubCategoryRepository = require('../repositories/admin/products/Categories/SubCategory/SubCategoryRepository');
-const { generateSlug, generateSKU } = require('../utils/helpers');
-const { generateProductId } = require('../utils/idGenerator');
-const AppError = require('../utils/AppError');
-const logger = require('../utils/logger');
-const { PRODUCT_STATUS } = require('../constants');
+const ProductRepository = require('../../../../repositories/admin/products/Product/ProductRepository');
+const CategoryRepository = require('../../../../repositories/admin/products/Categories/Category/CategoryRepository');
+const SubCategoryRepository = require('../../../../repositories/admin/products/Categories/SubCategory/SubCategoryRepository');
+const { generateSKU } = require('../../../../utils/helpers');
+const { generateProductId } = require('../../../../utils/idGenerator');
+const AppError = require('../../../../utils/AppError');
+const logger = require('../../../../utils/logger');
+const { PRODUCT_STATUS } = require('../../../../constants');
 
 /**
  * The admin category dropdown hands back a category's human-readable
@@ -81,40 +81,21 @@ class ProductService {
     if (status) filter.status = status;
 
     return ProductRepository.findAll(filter, {
-      sort: { createdAt: -1 },
+      sort: { productId: -1 },
       page: Number(page),
       limit: Number(limit),
-      populate: 'category collection subCategory',
+      populate: 'category subCategory',
     });
-  }
-
-/**
-   * Get single product by its customer-facing productId (e.g. "PRD00001"),
-   * falling back to the Mongo _id and then the slug. The storefront passes
-   * the public id (productId / _id) in URLs, but legacy links may use a slug.
-   */
-  async getProduct(id) {
-    let product = await ProductRepository.findByPublicId(id, {
-      populate: 'category collection subCategory',
-    });
-    if (!product) {
-      product = await ProductRepository.findOne(
-        { slug: id, isDeleted: false, isActive: true },
-        { populate: 'category collection subCategory' }
-      ).catch(() => null);
-    }
-    if (!product) {
-      throw AppError.notFound('Product not found');
-    }
-    return product;
   }
 
   /**
-   * Get product by slug.
+   * Get single product by its customer-facing productId (e.g. "PRD00001"),
+   * falling back to the Mongo _id. The storefront passes the public id
+   * (productId / _id) in URLs.
    */
-  async getProductBySlug(slug) {
-    const product = await ProductRepository.findOne({ slug, isDeleted: false, isActive: true }, {
-      populate: 'category collection subCategory',
+  async getProduct(id) {
+    const product = await ProductRepository.findByPublicId(id, {
+      populate: 'category subCategory',
     });
     if (!product) {
       throw AppError.notFound('Product not found');
@@ -138,9 +119,6 @@ class ProductService {
       data.sku = generateSKU('AYT');
     }
 
-    // Generate slug from name
-    data.slug = generateSlug(data.name);
-
     if (data.category !== undefined) data.category = await resolveCategoryRef(data.category);
     if (data.subCategory !== undefined) data.subCategory = await resolveSubCategoryRef(data.subCategory);
 
@@ -156,7 +134,9 @@ class ProductService {
 
     const product = await ProductRepository.create(data);
     logger.info(`Product created: ${product.name} (${product.sku})`);
-    return product;
+    // Re-fetch populated so category/subCategory come back as
+    // { id: customId, name } instead of a raw Mongo ObjectId.
+    return ProductRepository.findById(product.id || product._id, { populate: 'category subCategory' });
   }
 
   /**
@@ -168,11 +148,6 @@ class ProductService {
       throw AppError.notFound('Product not found');
     }
     const mongoId = existing.id;
-
-    // Regenerate slug if name changed
-    if (data.name && data.name !== existing.name) {
-      data.slug = generateSlug(data.name);
-    }
 
     if (data.category !== undefined) data.category = await resolveCategoryRef(data.category);
     if (data.subCategory !== undefined) data.subCategory = await resolveSubCategoryRef(data.subCategory);
@@ -186,7 +161,7 @@ class ProductService {
       }
     }
 
-    const updated = await ProductRepository.updateById(mongoId, data);
+    const updated = await ProductRepository.updateById(mongoId, data, { populate: 'category subCategory' });
     logger.info(`Product updated: ${updated.name}`);
     return updated;
   }
@@ -203,7 +178,7 @@ class ProductService {
       isDeleted: true,
       deletedAt: new Date(),
       isActive: false,
-    });
+    }, { populate: 'category subCategory' });
     logger.info(`Product soft-deleted: ${product.name}`);
     return product;
   }
@@ -220,7 +195,7 @@ class ProductService {
       isDeleted: false,
       deletedAt: null,
       isActive: true,
-    });
+    }, { populate: 'category subCategory' });
     logger.info(`Product restored: ${product.name}`);
     return product;
   }
@@ -245,7 +220,7 @@ class ProductService {
     if (!existing) {
       throw AppError.notFound('Product not found');
     }
-    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.PUBLISHED, isActive: true });
+    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.PUBLISHED, isActive: true }, { populate: 'category subCategory' });
   }
 
   /**
@@ -256,7 +231,7 @@ class ProductService {
     if (!existing) {
       throw AppError.notFound('Product not found');
     }
-    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.UNPUBLISHED, isActive: false });
+    return ProductRepository.updateById(existing.id, { status: PRODUCT_STATUS.UNPUBLISHED, isActive: false }, { populate: 'category subCategory' });
   }
 
   /**
@@ -272,7 +247,7 @@ class ProductService {
       throw AppError.notFound('Product not found');
     }
     logger.info(`Product duplicated: ${product.name}`);
-    return product;
+    return ProductRepository.findById(product.id || product._id, { populate: 'category subCategory' });
   }
 
   /**
@@ -331,8 +306,6 @@ class ProductService {
         { name: { $regex: searchTerm, $options: 'i' } },
         { sku: { $regex: searchTerm, $options: 'i' } },
         { tags: { $regex: searchTerm, $options: 'i' } },
-        { sareeFabric: { $regex: searchTerm, $options: 'i' } },
-        { primaryColor: { $regex: searchTerm, $options: 'i' } },
         { 'variants.sku': { $regex: searchTerm, $options: 'i' } },
       ],
     };
@@ -387,7 +360,7 @@ const result = await ProductRepository.findAll(filter, {
   async getTrendingProducts(limit = 10) {
     const result = await ProductRepository.findAll(
       { isDeleted: false, isActive: true, status: PRODUCT_STATUS.PUBLISHED },
-      { sort: { totalSold: -1, createdAt: -1 }, limit: Number(limit), populate: 'category' }
+      { sort: { totalSold: -1, productId: -1 }, limit: Number(limit), populate: 'category' }
     );
     return { ...result, data: result.data.map(serializeProductForWebsite) };
   }
@@ -403,7 +376,7 @@ const result = await ProductRepository.findAll(filter, {
   async getTodaysDealProducts(limit = 10) {
     const result = await ProductRepository.findAll(
       { isDeleted: false, isActive: true, status: PRODUCT_STATUS.PUBLISHED, discount: { $gt: 0 } },
-      { sort: { discount: -1, createdAt: -1 }, limit: Number(limit), populate: 'category' }
+      { sort: { discount: -1, productId: -1 }, limit: Number(limit), populate: 'category' }
     );
     return { ...result, data: result.data.map(serializeProductForWebsite) };
   }
@@ -411,7 +384,7 @@ const result = await ProductRepository.findAll(filter, {
   async getNewArrivalsProducts(limit = 10) {
     const result = await ProductRepository.findAll(
       { isDeleted: false, isActive: true, status: PRODUCT_STATUS.PUBLISHED },
-      { sort: { createdAt: -1 }, limit: Number(limit), populate: 'category' }
+      { sort: { productId: -1 }, limit: Number(limit), populate: 'category' }
     );
     return { ...result, data: result.data.map(serializeProductForWebsite) };
   }
@@ -419,7 +392,7 @@ const result = await ProductRepository.findAll(filter, {
   async getFlashSaleProducts(limit = 10) {
     const result = await ProductRepository.findAll(
       { isDeleted: false, isActive: true, status: PRODUCT_STATUS.PUBLISHED, discount: { $gte: 20 } },
-      { sort: { discount: -1, createdAt: -1 }, limit: Number(limit), populate: 'category' }
+      { sort: { discount: -1, productId: -1 }, limit: Number(limit), populate: 'category' }
     );
     return { ...result, data: result.data.map(serializeProductForWebsite) };
   }
@@ -453,8 +426,8 @@ const result = await ProductRepository.findAll(filter, {
 
 /**
  * Map a backend Product document to the storefront shape that the
- * website frontend expects (price, compareAtPrice, fabric, work, colour,
- * plain image URL array, category name, etc.).
+ * website frontend expects (price, compareAtPrice, plain image URL
+ * array, category name, etc.).
  */
 function refName(ref) {
   if (!ref) return '';
@@ -474,7 +447,6 @@ function serializeProductForWebsite(product) {
     : [];
 
   if (!images.length && product.mainImage) images.push(product.mainImage);
-  if (!images.length && product.thumbnail) images.push(product.thumbnail);
 
   const category = product.category && typeof product.category === 'object'
     ? product.category.name
@@ -486,7 +458,6 @@ function serializeProductForWebsite(product) {
     // wishlist and order placement. Falls back to the Mongo id only for
     // legacy products created before productId existed.
     id: product.productId || (product._id ? product._id.toString() : product.id),
-    slug: product.slug,
     name: product.name,
     sku: product.sku,
     description: product.description || product.shortDescription || '',
@@ -504,46 +475,18 @@ function serializeProductForWebsite(product) {
       : 0,
 
     // Product identity fields
-    fabric: product.sareeFabric || product.productType || '',
-    work: product.workType || '',
-    workType: product.workType || '',
-    colour: product.primaryColor || '',
-    color: product.primaryColor || '',
     occasion: Array.isArray(product.occasion) ? product.occasion : [],
-    sareeFabric: product.sareeFabric || '',
-    blouseFabric: product.blouseFabric || '',
-    primaryColor: product.primaryColor || '',
-    secondaryColor: product.secondaryColor || '',
-    pattern: product.pattern || '',
-    printType: product.printType || '',
-    style: product.style || '',
-    borderType: product.borderType || '',
-    palluType: product.palluType || '',
-    sareeLength: product.sareeLength || '',
-    blouseLength: product.blouseLength || '',
-    blouseIncluded: product.blouseIncluded !== false,
-    blouseType: product.blouseType || '',
-    blouseColor: product.blouseColor || '',
-    blouse: product.blouseIncluded !== false ? (product.blouseType || 'Unstitched') : '',
-
-    // Shipping / returns
-    codAvailable: product.codAvailable !== false,
-    returnAvailable: Boolean(product.returnAvailable),
-    exchangeAvailable: Boolean(product.exchangeAvailable),
-    returnDays: Number(product.returnDays || 0),
 
     // Images
     images,
     image: images[0] || '',
     mainImage: product.mainImage || images[0] || '',
 
-    // Category / sub-category / collection
+    // Category / sub-category
     categoryName: category,
     categoryId: refCategoryId(product.category),
     category,
     subCategoryName: refName(product.subCategory),
-    collectionName: refName(product.collection),
-    collectionSlug: typeof product.collection === 'object' ? (product.collection.slug || '') : '',
 
     // Commerce fields
     stock: Number(product.stock || 0),
@@ -555,10 +498,6 @@ function serializeProductForWebsite(product) {
     reviewCount: Number(product.reviewCount || 0),
     tags: Array.isArray(product.tags) ? product.tags : [],
     variants: Array.isArray(product.variants) ? product.variants : [],
-
-    // Date
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
   };
 }
 

@@ -1,4 +1,4 @@
-const ProductRepository = require('../repositories/ProductRepository');
+const ProductRepository = require('../repositories/admin/products/Product/ProductRepository');
 const CategoryRepository = require('../repositories/admin/products/Categories/Category/CategoryRepository');
 
 class SearchService {
@@ -23,8 +23,6 @@ class SearchService {
             { name: regex },
             { sku: regex },
             { tags: { $in: [regex] } },
-            { sareeFabric: regex },
-            { primaryColor: regex },
             { occasion: { $in: [regex] } },
           ],
         },
@@ -61,14 +59,14 @@ class SearchService {
 
     const products = await ProductRepository.findAll(
       { isDeleted: false, isActive: true, name: regex },
-      { sort: { totalSold: -1 }, limit, select: 'name slug sellingPrice mainImage' }
+      { sort: { totalSold: -1 }, limit, select: 'name productId sellingPrice mainImage' }
     );
 
     return (products.data || []).map((p) => ({
       type: 'product',
       id: p._id,
       name: p.name,
-      slug: p.slug,
+      productId: p.productId,
       price: p.sellingPrice,
       image: p.mainImage || '',
     }));

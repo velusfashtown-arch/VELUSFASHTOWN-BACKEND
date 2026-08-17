@@ -78,6 +78,23 @@ const MasterSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    // Core fields (the ones seeded as the day-one Add Product form) can be
+    // edited but never deleted — an admin can still rename a label, move it
+    // to another section, etc, but the field itself must always exist.
+    // Anything an admin adds afterwards is a genuinely optional field and
+    // defaults to false, so it can be freely edited AND deleted.
+    isCore: {
+      type: Boolean,
+      default: false,
+    },
+    // null = shows on every product regardless of category (the historical
+    // behaviour). Set to a Category's _id to scope the field to products in
+    // that category only (e.g. "Saree Fabric" only for Saree, not T-Shirt).
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      default: null,
+    },
   },
   { timestamps: true }
 );

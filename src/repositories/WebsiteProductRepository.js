@@ -1,7 +1,7 @@
 const BaseRepository = require('./BaseRepository');
 const WebsiteProduct = require('../models/tenant/WebsiteProduct');
 const WebsiteProductApproval = require('../models/tenant/WebsiteProductApproval');
-const Product = require('../models/admin/Product');
+const Product = require('../models/admin/Products/Product/Product');
 const Auth = require('../models/admin/auth/auth');
 const { APPROVAL_STATUS } = require('../constants');
 

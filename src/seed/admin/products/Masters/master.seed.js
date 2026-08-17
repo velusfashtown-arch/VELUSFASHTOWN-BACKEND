@@ -44,25 +44,6 @@ const SEED_FIELDS = [
   // ─── Description ────────────────────────────────────────────────────
   { key: 'shortDescription', label: 'Short Description', fieldType: 'textarea', placeholder: 'A brief summary shown in listings', maxLength: 300, group: 'Description' },
   { key: 'longDescription', label: 'Description', fieldType: 'richtext', placeholder: 'Full product description', group: 'Description' },
-
-  // ─── Shipping ───────────────────────────────────────────────────────
-  { key: 'shippingWeight', label: 'Weight (kg)', fieldType: 'number', placeholder: 'e.g. 0.5', min: 0, group: 'Shipping' },
-  { key: 'shippingLength', label: 'Length (cm)', fieldType: 'number', min: 0, group: 'Shipping' },
-  { key: 'shippingWidth', label: 'Width (cm)', fieldType: 'number', min: 0, group: 'Shipping' },
-  { key: 'shippingHeight', label: 'Height (cm)', fieldType: 'number', min: 0, group: 'Shipping' },
-  { key: 'shippingCharge', label: 'Shipping Charge (₹)', fieldType: 'number', min: 0, group: 'Shipping' },
-  { key: 'codAvailable', label: 'Cash on Delivery', fieldType: 'checkbox', helpText: 'Allow COD for this product', group: 'Shipping' },
-
-  // ─── Return Policy ──────────────────────────────────────────────────
-  { key: 'returnAvailable', label: 'Returns Available', fieldType: 'checkbox', group: 'Return Policy' },
-  {
-    key: 'returnDays', label: 'Return Window', fieldType: 'dropdown', placeholder: 'Select return window', group: 'Return Policy',
-    options: [
-      { value: '3', label: '3 Days' }, { value: '7', label: '7 Days' }, { value: '10', label: '10 Days' },
-      { value: '15', label: '15 Days' }, { value: '30', label: '30 Days' }, { value: '45', label: '45 Days' }, { value: '60', label: '60 Days' },
-    ],
-  },
-  { key: 'exchangeAvailable', label: 'Exchange Available', fieldType: 'checkbox', group: 'Return Policy' },
 ];
 
 async function seedMasters() {
@@ -77,6 +58,9 @@ async function seedMasters() {
     order: index,
     required: field.required || false,
     options: field.options || [],
+    // Seeded fields are the Add Product form's minimum viable set — they
+    // can be edited (label, section, etc) but never deleted.
+    isCore: true,
   }));
 
   await Master.insertMany(docs, { ordered: false });

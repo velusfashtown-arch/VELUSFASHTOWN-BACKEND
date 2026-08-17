@@ -1,5 +1,5 @@
 const Collection = require('../models/admin/Collection');
-const Product = require('../models/admin/Product');
+const Product = require('../models/admin/Products/Product/Product');
 const logger = require('../utils/logger');
 const { generateSlug } = require('../utils/helpers');
 

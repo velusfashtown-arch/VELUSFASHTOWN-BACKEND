@@ -18,10 +18,10 @@ router.use('/storefront', storefrontRoutes);
 
 // ─── Admin Routes (Private) ───────────────────────────────────────────
 const adminAuthRoutes = require('./admin/auth/auth.routes');
-const adminProductRoutes = require('./admin/product.routes');
 const adminCategoryRoutes = require('./admin/products/Categories/Category/category.routes');
 const adminSubCategoryRoutes = require('./admin/products/Categories/SubCategory/subCategory.routes');
 const adminMasterRoutes = require('./admin/products/Masters/master.routes');
+const adminProductRoutes = require('./admin/products/Product/product.routes');
 const adminCollectionRoutes = require('./admin/collection.routes');
 const adminOrderRoutes = require('./admin/order.routes');
 const adminCustomerRoutes = require('./admin/customer.routes');
@@ -32,10 +32,10 @@ const adminShippingRoutes = require('./admin/shipping.routes');
 const adminWebsiteRoutes = require('./admin/website.routes');
 
 router.use('/admin/auth', adminAuthRoutes);
-router.use('/admin/products', adminProductRoutes);
 router.use('/admin/category', adminCategoryRoutes);
 router.use('/admin/sub-category', adminSubCategoryRoutes);
 router.use('/admin/masters', adminMasterRoutes);
+router.use('/admin/products', adminProductRoutes);
 router.use('/admin/collections', adminCollectionRoutes);
 router.use('/admin/orders', adminOrderRoutes);
 router.use('/admin/customers', adminCustomerRoutes);

@@ -1,6 +1,6 @@
 const Order = require('../models/admin/Order');
 const Customer = require('../models/admin/Customer');
-const Product = require('../models/admin/Product');
+const Product = require('../models/admin/Products/Product/Product');
 const logger = require('../utils/logger');
 const { generateOrderNumber } = require('../utils/helpers');
 const { ORDER_STATUS, PAYMENT_METHODS, PAYMENT_STATUS } = require('../constants');

@@ -3,7 +3,7 @@
 if (require.main === module) require('dotenv').config();
 
 const { seedAuth } = require('./admin/auth/auth.seed');
-const { seedProducts } = require('./products.seed');
+const { seedProducts } = require('./admin/products/Product/product.seed');
 const { seedCategories } = require('./admin/products/Categories/Category/category.seed');
 const { seedSubCategories } = require('./admin/products/Categories/SubCategory/subCategory.seed');
 const { seedWebsites } = require('./website.seed');

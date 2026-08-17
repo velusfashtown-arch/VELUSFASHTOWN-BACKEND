@@ -1,5 +1,5 @@
 const AuthRepository = require('./AuthRepository');
-const ProductRepository = require('./ProductRepository');
+const ProductRepository = require('./admin/products/Product/ProductRepository');
 const CategoryRepository = require('./admin/products/Categories/Category/CategoryRepository');
 const SubCategoryRepository = require('./admin/products/Categories/SubCategory/SubCategoryRepository');
 const CollectionRepository = require('./CollectionRepository');

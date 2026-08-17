@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const WebsiteProductRepository = require('../repositories/WebsiteProductRepository');
 const WebsiteRepository = require('../repositories/WebsiteRepository');
-const ProductRepository = require('../repositories/ProductRepository');
+const ProductRepository = require('../repositories/admin/products/Product/ProductRepository');
 const AppError = require('../utils/AppError');
 const logger = require('../utils/logger');
 const { APPROVAL_STATUS } = require('../constants');

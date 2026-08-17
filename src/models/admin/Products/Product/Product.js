@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
-const slugify = require('slugify');
-const { STOCK_STATUS, PRODUCT_STATUS } = require('../../constants');
-const { adminConnection } = require('../../config/connections');
+const { randomUUID } = require('crypto');
+const { STOCK_STATUS, PRODUCT_STATUS } = require('../../../../constants');
+const { adminConnection } = require('../../../../config/connections');
+
+function generateVariantId() {
+  return `VAR-${randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase()}`;
+}
 
 // ─── Video Sub-Schema ───────────────────────────────────────────────────
 const VideoSchema = new mongoose.Schema(
@@ -21,11 +25,8 @@ const VideoSchema = new mongoose.Schema(
 const ImageSchema = new mongoose.Schema(
   {
     url: { type: String, required: true },
-    alt: { type: String, default: '' },
     order: { type: Number, default: 0 },
     isMain: { type: Boolean, default: false },
-    thumbnail: { type: String, default: '' },
-    publicId: { type: String, default: '' },
   },
   { _id: false }
 );
@@ -33,18 +34,21 @@ const ImageSchema = new mongoose.Schema(
 // ─── Variant Sub-Schema ─────────────────────────────────────────────────
 const VariantSchema = new mongoose.Schema(
   {
+    variantId: {
+      type: String,
+      required: true,
+      immutable: true,
+      default: generateVariantId,
+    },
     sku: { type: String, default: '' },
     color: { type: String, default: '' },
-    colorCode: { type: String, default: '' },
-    fabric: { type: String, default: '' },
-    size: { type: String, default: '' },
     price: { type: Number, default: 0, min: 0 },
     mrp: { type: Number, default: 0, min: 0 },
     stock: { type: Number, default: 0, min: 0 },
     images: [ImageSchema],
     isActive: { type: Boolean, default: true },
   },
-  { _id: true }
+  { _id: false }
 );
 
 // ─── Main Product Schema ────────────────────────────────────────────────
@@ -61,11 +65,6 @@ const ProductSchema = new mongoose.Schema(
       required: [true, 'Product name is required'],
       trim: true,
       maxlength: 500,
-    },
-    slug: {
-      type: String,
-      unique: true,
-      lowercase: true,
     },
     sku: {
       type: String,
@@ -88,8 +87,6 @@ const ProductSchema = new mongoose.Schema(
     // ─── Categorization ───────────────────────────────────────────────
     category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
     subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory', default: null },
-    collection: { type: mongoose.Schema.Types.ObjectId, ref: 'Collection', default: null },
-    productType: { type: String, default: '' },
 
     // ─── Inventory ────────────────────────────────────────────────────
     stock: { type: Number, default: 0, min: 0 },
@@ -104,43 +101,9 @@ const ProductSchema = new mongoose.Schema(
     countryOfOrigin: { type: String, default: 'India' },
     manufacturer: { type: String, default: '' },
     packer: { type: String, default: '' },
-    weight: { type: Number, default: 0 },
-    length: { type: Number, default: 0 },
-    width: { type: Number, default: 0 },
-    height: { type: Number, default: 0 },
-    shippingCharge: { type: Number, default: 0 },
-    codAvailable: { type: Boolean, default: true },
-    returnAvailable: { type: Boolean, default: false },
-    exchangeAvailable: { type: Boolean, default: false },
-    returnDays: { type: Number, default: 0 },
-
-    // ─── Saree Specific Details ───────────────────────────────────────
-    sareeFabric: { type: String, default: '' },
-    blouseFabric: { type: String, default: '' },
-    workType: { type: String, default: '' },
-    borderType: { type: String, default: '' },
-    palluType: { type: String, default: '' },
-    sareeLength: { type: String, default: '5.5 Mtrs' },
-    blouseLength: { type: String, default: '0.80 Mtrs' },
-    primaryColor: { type: String, default: '' },
-    secondaryColor: { type: String, default: '' },
-    pattern: { type: String, default: '' },
-    printType: { type: String, default: '' },
-    occasion: [{ type: String }],
-    style: { type: String, default: '' },
-    blouseIncluded: { type: Boolean, default: true },
-    blouseType: { type: String, default: '' },
-    blouseColor: { type: String, default: '' },
-
-    // ─── SEO ──────────────────────────────────────────────────────────
-    seoTitle: { type: String, default: '', maxlength: 70 },
-    seoDescription: { type: String, default: '', maxlength: 160 },
-    seoKeywords: [{ type: String }],
-    canonicalUrl: { type: String, default: '' },
 
     // ─── Images ───────────────────────────────────────────────────────
     mainImage: { type: String, default: '' },
-    thumbnail: { type: String, default: '' },
     images: [ImageSchema],
 
     // ─── Videos ───────────────────────────────────────────────────────
@@ -182,7 +145,7 @@ const ProductSchema = new mongoose.Schema(
     reviewCount: { type: Number, default: 0, min: 0 },
   },
   {
-    timestamps: true,
+    timestamps: false,
     suppressReservedKeysWarning: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -190,18 +153,17 @@ const ProductSchema = new mongoose.Schema(
 );
 
 // ─── Indexes ──────────────────────────────────────────────────────────
+// Note: productId already has a unique index from its field definition
+// below — that single-key index serves a `{ productId: -1 }` sort just
+// as well, so no separate index is declared for it here.
 ProductSchema.index({ name: 'text', description: 'text', tags: 'text' });
 ProductSchema.index({ category: 1, isDeleted: 1, isActive: 1 });
 ProductSchema.index({ sellingPrice: 1 });
-ProductSchema.index({ createdAt: -1 });
 ProductSchema.index({ totalSold: -1 });
 ProductSchema.index({ 'variants.sku': 1 });
 
 // ─── Hooks ───────────────────────────────────────────────────────────────
 ProductSchema.pre('save', function (next) {
-  if (this.isModified('name') && !this.slug) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
-  }
   if (this.isModified('stock')) {
     if (this.stock <= 0) {
       this.stockStatus = STOCK_STATUS.OUT_OF_STOCK;
@@ -266,5 +228,7 @@ ProductSchema.methods.unpublish = function () {
   this.isActive = false;
   return this.save();
 };
+
+ProductSchema.statics.generateVariantId = generateVariantId;
 
 module.exports = adminConnection.model('Product', ProductSchema);

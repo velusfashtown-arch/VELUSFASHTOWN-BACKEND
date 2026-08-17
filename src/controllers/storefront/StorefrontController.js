@@ -1,5 +1,5 @@
 const WebsiteProductRepository = require('../../repositories/WebsiteProductRepository');
-const ProductRepository = require('../../repositories/ProductRepository');
+const ProductRepository = require('../../repositories/admin/products/Product/ProductRepository');
 const WebsiteRepository = require('../../repositories/WebsiteRepository');
 const HomepageSection = require('../../models/tenant/HomepageSection');
 const Navigation = require('../../models/tenant/Navigation');
@@ -8,7 +8,7 @@ const Banner = require('../../models/tenant/Banner');
 const Page = require('../../models/tenant/Page');
 const CategoryRepository = require('../../repositories/admin/products/Categories/Category/CategoryRepository');
 const CollectionRepository = require('../../repositories/CollectionRepository');
-const Product = require('../../models/admin/Product');
+const Product = require('../../models/admin/Products/Product/Product');
 const FormRepository = require('../../repositories/FormRepository');
 const FormSubmissionService = require('../../services/FormSubmissionService');
 const asyncHandler = require('../../utils/asyncHandler');
@@ -34,7 +34,6 @@ function serializeForStorefront(product, assignment = {}) {
     ? product.images.map((img) => (typeof img === 'string' ? img : (img && img.url) || '')).filter(Boolean)
     : [];
   if (!images.length && product.mainImage) images.push(product.mainImage);
-  if (!images.length && product.thumbnail) images.push(product.thumbnail);
 
   const category = product.category && typeof product.category === 'object'
     ? product.category.name
@@ -48,7 +47,6 @@ function serializeForStorefront(product, assignment = {}) {
 
   return {
     id: product.productId || (product._id ? product._id.toString() : product.id),
-    slug: product.slug,
     name,
     sku: product.sku,
     description,
@@ -60,22 +58,7 @@ function serializeForStorefront(product, assignment = {}) {
     discountPercentage: compareAt > 0
       ? Math.round(((compareAt - price) / compareAt) * 100)
       : 0,
-    fabric: product.sareeFabric || product.productType || '',
-    work: product.workType || '',
-    workType: product.workType || '',
-    colour: product.primaryColor || '',
-    color: product.primaryColor || '',
     occasion: Array.isArray(product.occasion) ? product.occasion : [],
-    sareeFabric: product.sareeFabric || '',
-    blouseFabric: product.blouseFabric || '',
-    primaryColor: product.primaryColor || '',
-    secondaryColor: product.secondaryColor || '',
-    pattern: product.pattern || '',
-    borderType: product.borderType || '',
-    palluType: product.palluType || '',
-    sareeLength: product.sareeLength || '',
-    blouseLength: product.blouseLength || '',
-    blouseIncluded: product.blouseIncluded !== false,
     images,
     image: images[0] || '',
     mainImage: product.mainImage || images[0] || '',
@@ -87,8 +70,6 @@ function serializeForStorefront(product, assignment = {}) {
     reviewCount: Number(product.reviewCount || 0),
     tags: Array.isArray(product.tags) ? product.tags : [],
     variants: Array.isArray(product.variants) ? product.variants : [],
-    createdAt: product.createdAt,
-    updatedAt: product.updatedAt,
   };
 }
 
@@ -171,15 +152,15 @@ class StorefrontController {
       filter.$or = filter.$or || [];
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },
-        { sareeFabric: { $regex: search, $options: 'i' } },
-        { primaryColor: { $regex: search, $options: 'i' } },
       ];
     }
 
-    let sortOption = { createdAt: -1 };
+    // productId is sequential (PRD00001, PRD00002, ...), so it doubles as
+    // a reliable "newest first" ordering without a createdAt field.
+    let sortOption = { productId: -1 };
     if (sort === 'price_asc') sortOption = { sellingPrice: 1 };
     else if (sort === 'price_desc') sortOption = { sellingPrice: -1 };
-    else if (sort === 'newest') sortOption = { createdAt: -1 };
+    else if (sort === 'newest') sortOption = { productId: -1 };
     else if (sort === 'popularity' || sort === 'featured') sortOption = { totalSold: -1 };
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -201,10 +182,10 @@ class StorefrontController {
 const { slug } = req.params;
 
     const product = await Product.findOne({
-      $or: [{ slug }, { productId: slug }],
+      productId: slug,
       isDeleted: false,
       isActive: true,
-    }).populate('category collection').lean();
+    }).populate('category').lean();
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found', data: null });
     }
@@ -314,9 +295,6 @@ const { slug } = req.params;
       $or: [
         { name: { $regex: q, $options: 'i' } },
         { sku: { $regex: q, $options: 'i' } },
-        { sareeFabric: { $regex: q, $options: 'i' } },
-        { primaryColor: { $regex: q, $options: 'i' } },
-        { workType: { $regex: q, $options: 'i' } },
         { tags: { $regex: q, $options: 'i' } },
       ],
     };

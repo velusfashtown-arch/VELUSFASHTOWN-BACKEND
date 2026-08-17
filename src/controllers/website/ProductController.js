@@ -1,4 +1,4 @@
-const ProductService = require('../../services/ProductService');
+const ProductService = require('../../services/admin/products/Product/ProductService');
 const asyncHandler = require('../../utils/asyncHandler');
 
 class WebsiteProductController {
@@ -94,18 +94,12 @@ class WebsiteProductController {
   });
 
   /**
-   * GET /api/website/products/:slug - Get product by slug or ID.
+   * GET /api/website/products/:slug - Get product by productId or ID.
    * Returns the storefront shape: { success, message, product }.
    */
   getBySlug = asyncHandler(async (req, res) => {
     const { slug } = req.params;
-    // Try to find by slug first, then by ID
-    let product;
-    try {
-      product = await ProductService.getProductBySlug(slug);
-    } catch {
-      product = await ProductService.getProduct(slug);
-    }
+    const product = await ProductService.getProduct(slug);
     return res.json({
       success: true,
       message: 'Success',
@@ -121,26 +115,16 @@ class WebsiteProductController {
    * later won't require a frontend change.
    */
   checkDelivery = asyncHandler(async (req, res) => {
-    const { pincode, productId } = req.body;
+    const { pincode } = req.body;
 
     if (!/^[1-9][0-9]{5}$/.test(String(pincode || ''))) {
       return res.status(400).json({ success: false, message: 'Enter a valid 6-digit pincode', data: null });
     }
 
-    let codAvailable = true;
-    if (productId) {
-      try {
-        const product = await ProductService.getProduct(productId);
-        codAvailable = product?.codAvailable !== false;
-      } catch {
-        // Unknown product id — still return a generic estimate.
-      }
-    }
-
     return res.json({
       success: true,
       message: 'Success',
-      data: { serviceable: true, estimatedDays: '4-6', codAvailable },
+      data: { serviceable: true, estimatedDays: '4-6', codAvailable: true },
     });
   });
 

@@ -2,19 +2,13 @@ const { z } = require('zod');
 
 const imageSchema = z.object({
   url: z.string().url(),
-  alt: z.string().optional().default(''),
   order: z.number().optional().default(0),
   isMain: z.boolean().optional().default(false),
-  thumbnail: z.string().optional().default(''),
-  publicId: z.string().optional().default(''),
 });
 
 const variantSchema = z.object({
   sku: z.string().optional().default(''),
   color: z.string().optional().default(''),
-  colorCode: z.string().optional().default(''),
-  fabric: z.string().optional().default(''),
-  size: z.string().optional().default(''),
   price: z.number().min(0).optional().default(0),
   mrp: z.number().min(0).optional().default(0),
   stock: z.number().min(0).optional().default(0),
@@ -27,7 +21,6 @@ const createProductSchema = z.object({
     productId: z.string().optional(),
     name: z.string().min(1, 'Product name is required').max(500),
     sku: z.string().optional(),
-    slug: z.string().optional(),
     description: z.string().max(5000).optional().default(''),
     shortDescription: z.string().max(300).optional().default(''),
     mrp: z.number().min(0).optional().default(0),
@@ -37,7 +30,6 @@ const createProductSchema = z.object({
     gst: z.number().min(0).max(100).optional().default(0),
     category: z.string().min(1, 'Category is required'),
     subCategory: z.string().min(1, 'Sub category is required'),
-    productType: z.string().optional().default(''),
     occasion: z.array(z.string()).optional().default([]),
     stock: z.number().min(0).optional().default(0),
     lowStockAlert: z.number().min(0).optional().default(5),
@@ -48,27 +40,6 @@ const createProductSchema = z.object({
     // Custom fields (see the Master model) — value type depends on
     // the field's fieldType, so it's left loosely typed here.
     customFields: z.array(z.object({ key: z.string(), value: z.any() })).optional().default([]),
-    // Saree specific fields
-    sareeFabric: z.string().optional().default(''),
-    blouseFabric: z.string().optional().default(''),
-    workType: z.string().optional().default(''),
-    borderType: z.string().optional().default(''),
-    palluType: z.string().optional().default(''),
-    sareeLength: z.string().optional().default('5.5 Mtrs'),
-    blouseLength: z.string().optional().default('0.80 Mtrs'),
-    primaryColor: z.string().optional().default(''),
-    secondaryColor: z.string().optional().default(''),
-    pattern: z.string().optional().default(''),
-    printType: z.string().optional().default(''),
-    style: z.string().optional().default(''),
-    blouseIncluded: z.boolean().optional().default(true),
-    blouseType: z.string().optional().default(''),
-    blouseColor: z.string().optional().default(''),
-    // SEO
-    seoTitle: z.string().max(70).optional().default(''),
-    seoDescription: z.string().max(160).optional().default(''),
-    seoKeywords: z.array(z.string()).optional().default([]),
-    canonicalUrl: z.string().optional().default(''),
     // Images
     images: z.array(z.any()).optional().default([]),
     mainImage: z.string().optional().default(''),
@@ -76,17 +47,6 @@ const createProductSchema = z.object({
     productVideo: z.string().optional().default(''),
     youtubeUrl: z.string().optional().default(''),
     instagramReelUrl: z.string().optional().default(''),
-    // Shipping
-    weight: z.number().min(0).optional().default(0),
-    length: z.number().min(0).optional().default(0),
-    width: z.number().min(0).optional().default(0),
-    height: z.number().min(0).optional().default(0),
-    shippingCharge: z.number().min(0).optional().default(0),
-    codAvailable: z.boolean().optional().default(true),
-    // Return / Exchange
-    returnAvailable: z.boolean().optional().default(false),
-    returnDays: z.number().min(0).optional().default(0),
-    exchangeAvailable: z.boolean().optional().default(false),
     // Additional details
     countryOfOrigin: z.string().optional().default('India'),
     manufacturer: z.string().optional().default(''),
@@ -99,7 +59,6 @@ const updateProductSchema = z.object({
     productId: z.string().optional(),
     name: z.string().min(1).max(500).optional(),
     sku: z.string().optional(),
-    slug: z.string().optional(),
     description: z.string().max(5000).optional(),
     shortDescription: z.string().max(300).optional(),
     mrp: z.number().min(0).optional(),
@@ -109,7 +68,6 @@ const updateProductSchema = z.object({
     gst: z.number().min(0).max(100).optional(),
     category: z.string().optional().nullable(),
     subCategory: z.string().optional().nullable(),
-    productType: z.string().optional(),
     occasion: z.array(z.string()).optional(),
     stock: z.number().min(0).optional(),
     lowStockAlert: z.number().min(0).optional(),
@@ -118,46 +76,13 @@ const updateProductSchema = z.object({
     hasVariants: z.boolean().optional(),
     variants: z.array(variantSchema).optional(),
     customFields: z.array(z.object({ key: z.string(), value: z.any() })).optional(),
-    // Saree specific fields
-    sareeFabric: z.string().optional(),
-    blouseFabric: z.string().optional(),
-    workType: z.string().optional(),
-    borderType: z.string().optional(),
-    palluType: z.string().optional(),
-    sareeLength: z.string().optional(),
-    blouseLength: z.string().optional(),
-    primaryColor: z.string().optional(),
-    secondaryColor: z.string().optional(),
-    pattern: z.string().optional(),
-    printType: z.string().optional(),
-    style: z.string().optional(),
-    blouseIncluded: z.boolean().optional(),
-    blouseType: z.string().optional(),
-    blouseColor: z.string().optional(),
-    // SEO
-    seoTitle: z.string().max(70).optional(),
-    seoDescription: z.string().max(160).optional(),
-    seoKeywords: z.array(z.string()).optional(),
-    canonicalUrl: z.string().optional(),
     // Images - accept string URLs OR full image objects
     images: z.array(z.union([z.string(), imageSchema])).optional(),
     mainImage: z.string().optional(),
-    thumbnail: z.string().optional(),
     // Videos
     productVideo: z.string().optional(),
     youtubeUrl: z.string().optional(),
     instagramReelUrl: z.string().optional(),
-    // Shipping
-    weight: z.number().min(0).optional(),
-    length: z.number().min(0).optional(),
-    width: z.number().min(0).optional(),
-    height: z.number().min(0).optional(),
-    shippingCharge: z.number().min(0).optional(),
-    codAvailable: z.boolean().optional(),
-    // Return / Exchange
-    returnAvailable: z.boolean().optional(),
-    returnDays: z.number().min(0).optional(),
-    exchangeAvailable: z.boolean().optional(),
     // Additional details
     countryOfOrigin: z.string().optional(),
     manufacturer: z.string().optional(),
@@ -179,7 +104,6 @@ const productQuerySchema = z.object({
     sort: z.string().optional(),
     search: z.string().optional(),
     category: z.string().optional(),
-    collection: z.string().optional(),
     minPrice: z.string().optional(),
     maxPrice: z.string().optional(),
     stock: z.string().optional(),
@@ -190,10 +114,7 @@ const productQuerySchema = z.object({
     isTodaysDeal: z.string().optional(),
     isFlashSale: z.string().optional(),
     isNewArrival: z.string().optional(),
-    fabric: z.string().optional(),
     occasion: z.string().optional(),
-    color: z.string().optional(),
-    pattern: z.string().optional(),
     tags: z.string().optional(),
     isDeleted: z.string().optional(),
   }),
@@ -205,4 +126,3 @@ module.exports = {
   bulkProductSchema,
   productQuerySchema,
 };
-

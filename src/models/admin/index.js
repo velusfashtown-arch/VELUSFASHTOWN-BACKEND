@@ -1,5 +1,5 @@
 const Admin = require('./auth/auth');
-const Product = require('./Product');
+const Product = require('./Products/Product/Product');
 const Category = require('./Products/Categories/Category/Category');
 const SubCategory = require('./Products/Categories/SubCategory/SubCategory');
 const Collection = require('./Collection');

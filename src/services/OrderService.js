@@ -1,5 +1,5 @@
 const OrderRepository = require('../repositories/OrderRepository');
-const ProductRepository = require('../repositories/ProductRepository');
+const ProductRepository = require('../repositories/admin/products/Product/ProductRepository');
 const CustomerRepository = require('../repositories/CustomerRepository');
 const { generateOrderNumber } = require('../utils/helpers');
 const AppError = require('../utils/AppError');

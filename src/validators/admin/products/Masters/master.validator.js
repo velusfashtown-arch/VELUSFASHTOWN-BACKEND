@@ -22,6 +22,7 @@ const createMasterSchema = z.object({
     group: z.string().max(100).optional().default('Custom Fields'),
     order: z.number().optional().default(0),
     isActive: z.boolean().optional().default(true),
+    category: z.string().trim().optional().nullable(),
   }),
 });
 
@@ -41,6 +42,7 @@ const updateMasterSchema = z.object({
     group: z.string().max(100).optional(),
     order: z.number().optional(),
     isActive: z.boolean().optional(),
+    category: z.string().trim().optional().nullable(),
   }),
 });
 
