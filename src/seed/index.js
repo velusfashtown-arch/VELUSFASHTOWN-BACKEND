@@ -8,10 +8,10 @@ const { seedCategories } = require('./admin/products/Categories/Category/categor
 const { seedSubCategories } = require('./admin/products/Categories/SubCategory/subCategory.seed');
 const { seedWebsites } = require('./website.seed');
 const { seedMasters } = require('./admin/products/Masters/master.seed');
-const { seedCollections } = require('./collection.seed');
-const { seedCustomers } = require('./customer.seed');
-const { seedOrders } = require('./order.seed');
-const { seedForms } = require('./form.seed');
+const { seedCollections } = require('./admin/collections/Collection/collection.seed');
+const { seedCustomers } = require('./admin/customers/Customer/customer.seed');
+const { seedOrders } = require('./admin/orders/Order/order.seed');
+const { seedForms } = require('./admin/forms/Form/form.seed');
 const { seedWebsiteContent } = require('./websiteContent.seed');
 const logger = require('../utils/logger');
 

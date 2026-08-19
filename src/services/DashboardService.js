@@ -1,6 +1,6 @@
 const ProductRepository = require('../repositories/admin/products/Product/ProductRepository');
-const OrderRepository = require('../repositories/OrderRepository');
-const CustomerRepository = require('../repositories/CustomerRepository');
+const OrderRepository = require('../repositories/admin/orders/Order/OrderRepository');
+const CustomerRepository = require('../repositories/admin/customers/Customer/CustomerRepository');
 
 class DashboardService {
   /**

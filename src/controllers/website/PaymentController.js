@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { getRazorpay, isRazorpayConfigured } = require('../../config/razorpay');
-const OrderRepository = require('../../repositories/OrderRepository');
+const OrderRepository = require('../../repositories/admin/orders/Order/OrderRepository');
 const asyncHandler = require('../../utils/asyncHandler');
 const ApiResponse = require('../../utils/response');
 const AppError = require('../../utils/AppError');

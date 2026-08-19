@@ -4,7 +4,7 @@ const Navigation = require('../models/tenant/Navigation');
 const NavigationItem = require('../models/tenant/NavigationItem');
 const Banner = require('../models/tenant/Banner');
 const Category = require('../models/admin/Products/Categories/Category/Category');
-const Collection = require('../models/admin/Collection');
+const Collection = require('../models/admin/Collections/Collection/Collection');
 const logger = require('../utils/logger');
 const { HOMEPAGE_SECTION_TYPES, NAVIGATION_TYPES } = require('../constants');
 

@@ -22,14 +22,16 @@ const adminCategoryRoutes = require('./admin/products/Categories/Category/catego
 const adminSubCategoryRoutes = require('./admin/products/Categories/SubCategory/subCategory.routes');
 const adminMasterRoutes = require('./admin/products/Masters/master.routes');
 const adminProductRoutes = require('./admin/products/Product/product.routes');
-const adminCollectionRoutes = require('./admin/collection.routes');
-const adminOrderRoutes = require('./admin/order.routes');
-const adminCustomerRoutes = require('./admin/customer.routes');
+const adminCollectionRoutes = require('./admin/collections/Collection/collection.routes');
+const adminOrderRoutes = require('./admin/orders/Order/order.routes');
+const adminCustomerRoutes = require('./admin/customers/Customer/customer.routes');
 const adminDashboardRoutes = require('./admin/dashboard.routes');
 const adminUploadRoutes = require('./admin/upload.routes');
 const adminSearchRoutes = require('./admin/search.routes');
 const adminShippingRoutes = require('./admin/shipping.routes');
 const adminWebsiteRoutes = require('./admin/website.routes');
+const adminFormRoutes = require('./admin/forms/Form/form.routes');
+const adminFormSubmissionRoutes = require('./admin/forms/FormSubmission/formSubmission.routes');
 
 router.use('/admin/auth', adminAuthRoutes);
 router.use('/admin/category', adminCategoryRoutes);
@@ -44,5 +46,7 @@ router.use('/admin/upload', adminUploadRoutes);
 router.use('/admin/search', adminSearchRoutes);
 router.use('/admin/shipping', adminShippingRoutes);
 router.use('/admin/websites', adminWebsiteRoutes);
+router.use('/admin/websites', adminFormRoutes);
+router.use('/admin/websites', adminFormSubmissionRoutes);
 
 module.exports = router;

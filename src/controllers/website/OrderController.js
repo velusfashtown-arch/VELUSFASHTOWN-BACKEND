@@ -1,4 +1,4 @@
-const OrderService = require('../../services/OrderService');
+const OrderService = require('../../services/admin/orders/Order/OrderService');
 const asyncHandler = require('../../utils/asyncHandler');
 const ApiResponse = require('../../utils/response');
 

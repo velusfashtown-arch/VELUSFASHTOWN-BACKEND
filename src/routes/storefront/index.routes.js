@@ -3,7 +3,7 @@ const router = express.Router();
 const { resolveWebsite } = require('../../middleware/resolveWebsite');
 const { validate } = require('../../middleware/validate');
 const { StorefrontController } = require('../../controllers/storefront/StorefrontController');
-const { submitFormSchema } = require('../../validators/form.validator');
+const { submitFormSchema } = require('../../validators/admin/forms/Form/form.validator');
 
 // Resolve the website for every storefront request.
 router.use(resolveWebsite);

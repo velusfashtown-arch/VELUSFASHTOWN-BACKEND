@@ -2,10 +2,9 @@ const Admin = require('./auth/auth');
 const Product = require('./Products/Product/Product');
 const Category = require('./Products/Categories/Category/Category');
 const SubCategory = require('./Products/Categories/SubCategory/SubCategory');
-const Collection = require('./Collection');
-const Order = require('./Order');
-const Customer = require('./Customer');
-const { Inventory, LowStockAlert } = require('./Inventory');
+const Collection = require('./Collections/Collection/Collection');
+const Order = require('./Orders/Order/Order');
+const Customer = require('./Customers/Customer/Customer');
 
 const tenantModels = require('../tenant');
 
@@ -17,8 +16,6 @@ module.exports = {
   Collection,
   Order,
   Customer,
-  Inventory,
-  LowStockAlert,
   ...tenantModels,
 };
 
